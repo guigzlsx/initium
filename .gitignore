@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Xcode generated files
+DerivedData/
+build/
+*.xcresult
+*.xcuserstate
+xcuserdata/
+
+# Swift Package Manager
+.build/
+
+# Local signing and environment files
+*.p12
+*.mobileprovision
