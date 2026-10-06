@@ -7,6 +7,7 @@ struct InitiumApp: App {
     private let modelContainer: ModelContainer
 
     @StateObject private var appState = AppState()
+    @StateObject private var entryFlow = EntryFlowViewModel()
     @AppStorage("initium.appearance") private var appearance = InitiumAppearance.system.rawValue
 
     init() {
@@ -35,12 +36,29 @@ struct InitiumApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootTabView()
+            InitiumRootView()
                 .environmentObject(appState)
+                .environmentObject(entryFlow)
                 .modelContainer(modelContainer)
                 .tint(AppTheme.accent)
                 .preferredColorScheme(InitiumAppearance(rawValue: appearance)?.colorScheme)
         }
+    }
+}
+
+private struct InitiumRootView: View {
+    @EnvironmentObject private var entryFlow: EntryFlowViewModel
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Group {
+            if entryFlow.state == .mainApp {
+                RootTabView()
+            } else {
+                EntryFlowView(viewModel: entryFlow)
+            }
+        }
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: entryFlow.state)
     }
 }
 
@@ -73,8 +91,9 @@ private struct RootTabView: View {
                 }
                 .tag(AppTab.insights)
         }
-        .toolbarBackground(AppTheme.cardBackground, for: .tabBar)
+        .toolbarBackground(AppTheme.background, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
-        .tint(AppTheme.accent)
+        .toolbarColorScheme(.dark, for: .tabBar)
+        .tint(AppTheme.primaryText)
     }
 }

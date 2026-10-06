@@ -19,7 +19,7 @@ struct NowView: View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             NavigationStack {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
                         if let transitionActivity = activeTransitionActivity(at: context.date) {
                             transitionContent(for: transitionActivity, now: context.date)
                         } else if let currentActivity = resolver.currentActivity(from: activities, now: context.date) {
@@ -32,12 +32,15 @@ struct NowView: View {
                             idleContent(now: context.date)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal, AppTheme.screenHorizontalPadding)
+                    .padding(.top, InitiumSpacing.md)
+                    .padding(.bottom, 112)
                 }
                 .scrollIndicators(.hidden)
                 .initiumScreen()
-                .navigationTitle("Now")
+                .navigationTitle("")
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar(.hidden, for: .navigationBar)
             }
         }
         .alert("Une action n'a pas pu aboutir", isPresented: errorBinding) {
@@ -130,19 +133,20 @@ struct NowView: View {
 
         VStack(alignment: .leading, spacing: 20) {
             Text("PRÉPARATION")
-                .font(.caption.weight(.bold))
-                .tracking(1.3)
-                .foregroundStyle(AppTheme.warmAccent)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
+                .foregroundStyle(AppTheme.accent)
 
             Text(activity.title)
-                .font(.largeTitle.weight(.bold))
+                .font(AppTheme.Typography.largeTitle)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(InitiumLocalization.string("now.ready_for", activity.scheduledStartAt.formatted(date: .omitted, time: .shortened)))
-                .font(.title3.weight(.semibold))
+                .font(AppTheme.Typography.cardTitle)
+                .foregroundStyle(AppTheme.primaryText)
 
             if let plan {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Text("Préparation estimée")
                             .font(.subheadline)
@@ -162,6 +166,7 @@ struct NowView: View {
                             .foregroundStyle(AppTheme.mutedText)
                     }
                 }
+                .initiumCard(padding: 18)
             }
 
             if let plan,
@@ -190,27 +195,28 @@ struct NowView: View {
             HStack {
                 Text(InitiumLocalization.string("now.step_progress", state.currentStepIndex + 1, state.totalStepCount))
                     .font(.subheadline.weight(.semibold))
-                Spacer()
-                Text(state.progressText)
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(AppTheme.secondaryText)
             }
 
             InitiumProgressBar(
                 progress: Double(state.currentStepIndex) / Double(max(1, state.totalStepCount))
             )
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(step.title)
-                    .font(.title2.weight(.semibold))
+                    .font(AppTheme.Typography.cardTitle)
+                    .foregroundStyle(AppTheme.primaryText)
                 Text(InitiumLocalization.string("duration.approx", ActivityTiming.durationText(seconds: step.estimatedDurationSeconds)))
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.secondaryText)
             }
+            .padding(22)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.large))
             .accessibilityElement(children: .combine)
             .accessibilityLabel(InitiumLocalization.string("now.step_accessibility", state.currentStepIndex + 1, state.totalStepCount, step.title))
 
             Button("Terminé") {
+                InitiumHaptics.success()
                 viewModel.completeTransitionStep(for: activity, at: .now, in: modelContext)
             }
             .buttonStyle(InitiumPrimaryButtonStyle())
@@ -240,14 +246,14 @@ struct NowView: View {
 
     @ViewBuilder
     private func currentContent(for activity: Activity, now: Date) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 22) {
             Text("NOW")
-                .font(.caption.weight(.bold))
-                .tracking(1.3)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
                 .foregroundStyle(AppTheme.accent)
 
             Text(activity.title)
-                .font(.largeTitle.weight(.bold))
+                .font(AppTheme.Typography.largeTitle)
                 .foregroundStyle(AppTheme.primaryText)
                 .fixedSize(horizontal: false, vertical: true)
 
@@ -301,12 +307,10 @@ struct NowView: View {
         case .inProgress:
             VStack(alignment: .leading, spacing: 6) {
                 if let remaining = ActivityTiming.remainingSeconds(for: activity, at: now), remaining > 0 {
-                    Text(ActivityTiming.remainingText(seconds: remaining))
-                        .font(.system(.title, design: .rounded).weight(.bold))
-                        .monospacedDigit()
+                    InitiumRemainingMetric(seconds: remaining)
                 } else {
                     Text("Le temps prévu est dépassé")
-                        .font(.title3.weight(.semibold))
+                        .font(AppTheme.Typography.cardTitle)
                 }
 
                 let elapsed = ActivityTiming.elapsedSeconds(for: activity, at: now)
@@ -329,12 +333,14 @@ struct NowView: View {
     private func routineContent(for activity: Activity, now: Date) -> some View {
         if let state = viewModel.routineState(for: activity), state.totalStepCount > 0 {
             VStack(alignment: .leading, spacing: 14) {
-                Divider()
+                Rectangle()
+                    .fill(AppTheme.border)
+                    .frame(height: 1)
 
                 HStack {
                     Text("ROUTINE")
-                        .font(.caption.weight(.bold))
-                        .tracking(1.1)
+                        .font(AppTheme.Typography.caption)
+                        .tracking(1.7)
                         .foregroundStyle(AppTheme.secondaryText)
 
                     Spacer()
@@ -352,7 +358,7 @@ struct NowView: View {
                             .foregroundStyle(AppTheme.secondaryText)
 
                         Text(step.title)
-                            .font(.title3.weight(.semibold))
+                            .font(AppTheme.Typography.cardTitle)
 
                         Text(InitiumLocalization.string("duration.approx", ActivityTiming.durationText(seconds: step.estimatedDurationSeconds)))
                             .font(.subheadline)
@@ -362,6 +368,7 @@ struct NowView: View {
                     .accessibilityLabel(InitiumLocalization.string("now.step_duration_accessibility", state.currentStepIndex + 1, state.totalStepCount, step.title, ActivityTiming.durationText(seconds: step.estimatedDurationSeconds)))
 
                     Button("Terminé") {
+                        InitiumHaptics.success()
                         viewModel.completeCurrentStep(for: activity, at: .now, in: modelContext)
                     }
                     .buttonStyle(InitiumPrimaryButtonStyle())
@@ -391,6 +398,7 @@ struct NowView: View {
         switch activity.status {
         case .planned:
             Button("Commencer") {
+                InitiumHaptics.selection()
                 viewModel.requestStart(activity: activity, at: .now, in: modelContext)
             }
             .buttonStyle(InitiumPrimaryButtonStyle())
@@ -402,6 +410,7 @@ struct NowView: View {
             secondaryActions(for: activity)
         case .paused:
             Button("Reprendre") {
+                InitiumHaptics.selection()
                 viewModel.resume(activity: activity, at: .now, in: modelContext)
             }
             .buttonStyle(InitiumPrimaryButtonStyle())
@@ -498,20 +507,20 @@ struct NowView: View {
     }
 
     private func nextContent(for activity: Activity) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("ENSUITE")
-                .font(.caption.weight(.bold))
-                .tracking(1.1)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.7)
                 .foregroundStyle(AppTheme.secondaryText)
 
             Text(activity.title)
-                .font(.body.weight(.medium))
+                .font(AppTheme.Typography.cardTitle)
 
             Text(activity.scheduledStartAt, format: .dateTime.hour().minute())
                 .font(.subheadline.monospacedDigit())
                 .foregroundStyle(AppTheme.secondaryText)
         }
-        .initiumCard()
+        .initiumCard(padding: 18)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(InitiumLocalization.string("now.next_accessibility", activity.title, activity.scheduledStartAt.formatted(date: .omitted, time: .shortened)))
     }

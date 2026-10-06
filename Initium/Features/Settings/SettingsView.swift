@@ -22,6 +22,7 @@ enum InitiumAppearance: String, CaseIterable, Identifiable {
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var entryFlow: EntryFlowViewModel
     @AppStorage("initium.appearance") private var appearance = InitiumAppearance.system.rawValue
 
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
@@ -30,50 +31,97 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("APPARENCE") {
-                    Picker("Apparence", selection: $appearance) {
-                        Text("Système").tag(InitiumAppearance.system.rawValue)
-                        Text("Clair").tag(InitiumAppearance.light.rawValue)
-                        Text("Sombre").tag(InitiumAppearance.dark.rawValue)
-                    }
-                }
-
-                Section("RAPPELS") {
-                    HStack {
-                        Label("Notifications", systemImage: "bell")
-                        Spacer()
-                        Text(notificationStatusText)
-                            .foregroundStyle(.secondary)
+            ScrollView {
+                VStack(alignment: .leading, spacing: InitiumSpacing.md) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("SETTINGS")
+                            .font(AppTheme.Typography.caption)
+                            .tracking(1.8)
+                            .foregroundStyle(AppTheme.accent)
+                        Text("Réglages")
+                            .font(AppTheme.Typography.largeTitle)
+                            .foregroundStyle(AppTheme.primaryText)
                     }
 
-                    if notificationStatus == .denied {
-                        Text("Les rappels sont désactivés. Tu peux les réactiver dans les réglages de l’iPhone.")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
+                    settingsCard(eyebrow: "APPARENCE") {
+                        Picker("Apparence", selection: $appearance) {
+                            Text("Système").tag(InitiumAppearance.system.rawValue)
+                            Text("Clair").tag(InitiumAppearance.light.rawValue)
+                            Text("Sombre").tag(InitiumAppearance.dark.rawValue)
+                        }
+                        .pickerStyle(.menu)
+                        .tint(AppTheme.primaryText)
+                    }
 
-                        Button("Ouvrir les réglages") {
-                            openSystemSettings()
+                    settingsCard(eyebrow: "RAPPELS") {
+                        HStack(spacing: 12) {
+                            Image(systemName: "bell")
+                                .foregroundStyle(AppTheme.accent)
+                            Text("Notifications")
+                                .font(.body.weight(.semibold))
+                            Spacer()
+                            Text(notificationStatusText)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+
+                        if notificationStatus == .denied {
+                            Text("Les rappels sont désactivés. Tu peux les réactiver dans les réglages de l’iPhone.")
+                                .font(.footnote)
+                                .foregroundStyle(AppTheme.secondaryText)
+
+                            Button("Ouvrir les réglages") {
+                                openSystemSettings()
+                            }
+                            .buttonStyle(InitiumSecondaryButtonStyle())
                         }
                     }
-                }
 
-                Section("DONNÉES ET CONFIDENTIALITÉ") {
-                    Text("Tes données restent sur cet appareil. Initium n’utilise aucun compte et n’envoie pas tes activités à un serveur.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                    settingsCard(eyebrow: "DONNÉES ET CONFIDENTIALITÉ") {
+                        Text("Tes données restent sur cet appareil. Initium n’utilise aucun compte et n’envoie pas tes activités à un serveur.")
+                            .font(.footnote)
+                            .foregroundStyle(AppTheme.secondaryText)
 
-                    Button("Effacer toutes mes données", role: .destructive) {
-                        showingDeleteConfirmation = true
+                        Button("Effacer toutes mes données", role: .destructive) {
+                            showingDeleteConfirmation = true
+                        }
+                        .font(.body.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     }
-                }
 
-                Section("À PROPOS") {
-                    LabeledContent("Version", value: appVersion)
-                    LabeledContent("Build", value: appBuild)
+                    settingsCard(eyebrow: "À PROPOS") {
+                        HStack {
+                            Text("Version")
+                            Spacer()
+                            Text(appVersion)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+                        HStack {
+                            Text("Build")
+                            Spacer()
+                            Text(appBuild)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+                    }
+
+                    #if DEBUG
+                    settingsCard(eyebrow: "DEBUG") {
+                        Button("Réinitialiser l'entrée") {
+                            entryFlow.resetForDevelopment()
+                            dismiss()
+                        }
+                        .buttonStyle(InitiumSecondaryButtonStyle())
+                    }
+                    #endif
                 }
+                .padding(.horizontal, AppTheme.screenHorizontalPadding)
+                .padding(.top, InitiumSpacing.md)
+                .padding(.bottom, InitiumSpacing.xl)
             }
-            .navigationTitle("Réglages")
+            .scrollIndicators(.hidden)
+            .initiumScreen()
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Terminé") { dismiss() }
@@ -100,6 +148,21 @@ struct SettingsView: View {
                 await refreshNotificationStatus()
             }
         }
+    }
+
+    private func settingsCard<Content: View>(
+        eyebrow: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: InitiumSpacing.md) {
+            Text(LocalizedStringKey(eyebrow))
+                .font(AppTheme.Typography.caption)
+                .tracking(1.7)
+                .foregroundStyle(AppTheme.mutedText)
+
+            content()
+        }
+        .initiumCard(padding: 20)
     }
 
     private var notificationStatusText: String {
@@ -154,4 +217,5 @@ struct SettingsView: View {
 #Preview("Settings") {
     SettingsView()
         .modelContainer(PersistenceController.preview)
+        .environmentObject(EntryFlowViewModel())
 }

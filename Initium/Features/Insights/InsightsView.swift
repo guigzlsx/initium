@@ -13,7 +13,7 @@ struct InsightsView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
                     header
                     periodPicker
 
@@ -24,11 +24,13 @@ struct InsightsView: View {
                             .frame(maxWidth: .infinity, minHeight: 220)
                     }
                 }
-                .padding()
+                .padding(.horizontal, AppTheme.screenHorizontalPadding)
+                .padding(.top, InitiumSpacing.md)
+                .padding(.bottom, InitiumSpacing.xl)
             }
             .scrollIndicators(.hidden)
             .initiumScreen()
-            .navigationTitle("Insights")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .task(id: refreshKey) {
                 viewModel.refresh(activities: activities, routines: routines)
@@ -38,22 +40,44 @@ struct InsightsView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Comprendre ton temps.")
-                .font(.largeTitle.weight(.bold))
+            Text("INSIGHTS")
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
+                .foregroundStyle(AppTheme.accent)
+
+            Text("Insights")
+                .font(AppTheme.Typography.largeTitle)
+                .foregroundStyle(AppTheme.primaryText)
 
             Text("Des repères simples, basés sur ce que tu as réellement fait.")
-                .font(.subheadline)
+                .font(AppTheme.Typography.secondary)
                 .foregroundStyle(AppTheme.secondaryText)
         }
     }
 
     private var periodPicker: some View {
-            Picker("Période", selection: $viewModel.period) {
-                ForEach(InsightsPeriod.allCases) { period in
-                Text(LocalizedStringKey(period.title)).tag(period)
+        HStack(spacing: 10) {
+            ForEach(InsightsPeriod.allCases) { period in
+                Button {
+                    viewModel.period = period
+                } label: {
+                    Text(LocalizedStringKey(period.title))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(viewModel.period == period ? AppTheme.primaryText : AppTheme.secondaryText)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(
+                            viewModel.period == period ? AppTheme.surfaceElevated : AppTheme.surface,
+                            in: RoundedRectangle(cornerRadius: InitiumRadius.medium)
+                        )
+                        .overlay {
+                            RoundedRectangle(cornerRadius: InitiumRadius.medium)
+                                .stroke(viewModel.period == period ? AppTheme.accent.opacity(0.42) : AppTheme.border, lineWidth: 1)
+                        }
+                }
+                .buttonStyle(.plain)
             }
         }
-        .pickerStyle(.segmented)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel("Période des insights")
     }
 
@@ -102,15 +126,15 @@ struct InsightsView: View {
             sectionLabel("TON TEMPS")
 
             if let insight, insight.isReliable {
-                HStack(alignment: .lastTextBaseline, spacing: 24) {
-                    metric(
-                        title: "Prévu",
-                        value: durationText(insight.estimatedAverageSeconds)
-                    )
-                    metric(
-                        title: "Réel",
-                        value: durationText(insight.actualAverageSeconds)
-                    )
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 12) {
+                        InitiumMetricCard(label: "Prévu", value: durationText(insight.estimatedAverageSeconds))
+                        InitiumMetricCard(label: "Réel", value: durationText(insight.actualAverageSeconds))
+                    }
+                    VStack(spacing: 12) {
+                        InitiumMetricCard(label: "Prévu", value: durationText(insight.estimatedAverageSeconds))
+                        InitiumMetricCard(label: "Réel", value: durationText(insight.actualAverageSeconds))
+                    }
                 }
 
                 comparisonBars(
@@ -135,10 +159,10 @@ struct InsightsView: View {
             sectionLabel("PRÉPARATION")
 
             ForEach(Array(insights.prefix(3))) { insight in
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(insight.name)
-                            .font(.title3.weight(.semibold))
+                            .font(AppTheme.Typography.cardTitle)
                         Spacer()
                         if insight.isReliable {
                             Text(InitiumLocalization.string("insights.times", insight.observationCount))
@@ -148,15 +172,15 @@ struct InsightsView: View {
                     }
 
                     if insight.isReliable {
-                        HStack(alignment: .lastTextBaseline, spacing: 18) {
-                            metric(
-                                title: "Prévu",
-                                value: durationText(insight.estimatedDurationSeconds)
-                            )
-                            metric(
-                                title: "Réel moyen",
-                                value: durationText(insight.actualAverageSeconds)
-                            )
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 12) {
+                                InitiumMetricCard(label: "Prévu", value: durationText(insight.estimatedDurationSeconds))
+                                InitiumMetricCard(label: "Réel moyen", value: durationText(insight.actualAverageSeconds))
+                            }
+                            VStack(spacing: 12) {
+                                InitiumMetricCard(label: "Prévu", value: durationText(insight.estimatedDurationSeconds))
+                                InitiumMetricCard(label: "Réel moyen", value: durationText(insight.actualAverageSeconds))
+                            }
                         }
                         comparisonBars(
                             estimated: insight.estimatedDurationSeconds,
@@ -177,7 +201,9 @@ struct InsightsView: View {
                 }
 
                 if insight.id != insights.prefix(3).last?.id {
-                    Divider()
+                    Rectangle()
+                        .fill(AppTheme.border)
+                        .frame(height: 1)
                 }
             }
         }
@@ -191,7 +217,7 @@ struct InsightsView: View {
 
             if insight.isReliable {
                 Text(startDelayText(seconds: insight.averageDelaySeconds))
-                    .font(.title3.weight(.semibold))
+                    .font(AppTheme.Typography.cardTitle)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(InitiumLocalization.string("insights.starts", insight.observationCount))
@@ -215,7 +241,7 @@ struct InsightsView: View {
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(insight.title)
-                                .font(.headline)
+                                .font(AppTheme.Typography.cardTitle)
                             Text(InitiumLocalization.string("insights.longer_average", durationText(insight.differenceSeconds)))
                                 .font(.subheadline)
                                 .foregroundStyle(AppTheme.secondaryText)
@@ -230,14 +256,16 @@ struct InsightsView: View {
 
             if !snapshot.wellCalibratedActivities.isEmpty {
                 if !snapshot.underestimatedActivities.isEmpty {
-                    Divider()
+                    Rectangle()
+                        .fill(AppTheme.border)
+                        .frame(height: 1)
                 }
 
                 sectionLabel("BIEN CALIBRÉ")
                 ForEach(snapshot.wellCalibratedActivities) { insight in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(insight.title)
-                            .font(.headline)
+                            .font(AppTheme.Typography.cardTitle)
                         Text(InitiumLocalization.string("insights.calibrated", durationText(insight.estimatedAverageSeconds), durationText(insight.actualAverageSeconds)))
                             .font(.subheadline)
                             .foregroundStyle(AppTheme.secondaryText)
@@ -247,7 +275,9 @@ struct InsightsView: View {
 
             if snapshot.replan.replannedActivityCount > 0 {
                 if !snapshot.underestimatedActivities.isEmpty || !snapshot.wellCalibratedActivities.isEmpty {
-                    Divider()
+                    Rectangle()
+                        .fill(AppTheme.border)
+                        .frame(height: 1)
                 }
 
                 sectionLabel("RÉORGANISATIONS")
@@ -306,18 +336,18 @@ struct InsightsView: View {
     private func metric(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(value)
-                .font(.system(.title, design: .rounded).weight(.bold))
+                .font(AppTheme.Typography.metricLarge)
                 .monospacedDigit()
             Text(title)
-                .font(.caption)
+                .font(AppTheme.Typography.caption)
                 .foregroundStyle(AppTheme.secondaryText)
         }
     }
 
     private func sectionLabel(_ title: String) -> some View {
         Text(title)
-            .font(.caption.weight(.bold))
-            .tracking(1.3)
+            .font(AppTheme.Typography.caption)
+            .tracking(1.7)
             .foregroundStyle(AppTheme.mutedText)
     }
 

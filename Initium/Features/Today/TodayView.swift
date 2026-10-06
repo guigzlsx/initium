@@ -33,7 +33,8 @@ struct TodayView: View {
     private func navigationContent(now: Date) -> some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
+                    topControls
                     header(now: now)
                     nowSection(now: now)
 
@@ -47,11 +48,13 @@ struct TodayView: View {
 
                     timeline(now: now)
                 }
-                .padding()
+                .padding(.horizontal, AppTheme.screenHorizontalPadding)
+                .padding(.top, InitiumSpacing.sm)
+                .padding(.bottom, 112)
             }
             .scrollIndicators(.hidden)
             .initiumScreen()
-            .navigationTitle("Today")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             #if DEBUG
             .onAppear {
@@ -66,61 +69,7 @@ struct TodayView: View {
                 }
             }
             #endif
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarLeading) {
-                    Button {
-                        changeDay(by: -1)
-                    } label: {
-                        Image(systemName: "chevron.left")
-                    }
-                    .accessibilityLabel("Jour précédent")
-
-                    if !calendar.isDateInToday(selectedDate) {
-                        Button("Aujourd'hui") {
-                            selectedDate = .now
-                        }
-                    }
-
-                    Button {
-                        changeDay(by: 1)
-                    } label: {
-                        Image(systemName: "chevron.right")
-                    }
-                    .accessibilityLabel("Jour suivant")
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 12) {
-                        if canOpenReplan {
-                            Menu {
-                                Button {
-                                    openReplan(at: .now)
-                                } label: {
-                                    Label("Réorganiser la journée", systemImage: "arrow.trianglehead.2.clockwise")
-                                }
-                            } label: {
-                                Image(systemName: "ellipsis")
-                            }
-                            .accessibilityLabel("Actions de la journée")
-                        }
-
-                        Button {
-                            editingActivity = nil
-                            showingActivityEditor = true
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                        .accessibilityLabel("Ajouter une activité")
-
-                        Button {
-                            showingSettings = true
-                        } label: {
-                            Image(systemName: "gearshape")
-                        }
-                        .accessibilityLabel("Réglages")
-                    }
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $showingActivityEditor, onDismiss: {
                 editingActivity = nil
             }) {
@@ -167,14 +116,97 @@ struct TodayView: View {
         }
     }
 
+    private var topControls: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 6) {
+                compactIconButton("chevron.left", label: "Jour précédent") {
+                    changeDay(by: -1)
+                }
+
+                if !calendar.isDateInToday(selectedDate) {
+                    Button("Aujourd'hui") {
+                        selectedDate = .now
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(AppTheme.primaryText)
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 44)
+                    .background(AppTheme.surfaceElevated, in: Capsule())
+                    .overlay { Capsule().stroke(AppTheme.border, lineWidth: 1) }
+                }
+
+                compactIconButton("chevron.right", label: "Jour suivant") {
+                    changeDay(by: 1)
+                }
+            }
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 6) {
+                if canOpenReplan {
+                    Menu {
+                        Button {
+                            openReplan(at: .now)
+                        } label: {
+                            Label("Réorganiser la journée", systemImage: "arrow.trianglehead.2.clockwise")
+                        }
+                    } label: {
+                        topControlIcon("ellipsis", label: "Actions de la journée")
+                    }
+                }
+
+                compactIconButton("plus", label: "Ajouter une activité") {
+                    editingActivity = nil
+                    showingActivityEditor = true
+                }
+
+                compactIconButton("gearshape", label: "Réglages") {
+                    showingSettings = true
+                }
+            }
+        }
+    }
+
+    private func compactIconButton(
+        _ systemName: String,
+        label: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            topControlIcon(systemName, label: label)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+
+    private func topControlIcon(_ systemName: String, label: String) -> some View {
+        Image(systemName: systemName)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(AppTheme.primaryText)
+            .frame(width: 44, height: 44)
+            .background(AppTheme.surfaceElevated, in: Circle())
+            .overlay { Circle().stroke(AppTheme.border, lineWidth: 1) }
+            .accessibilityLabel(label)
+    }
+
     private func header(now: Date) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(greeting(for: now))
-                .font(.largeTitle.weight(.bold))
+            Text("TODAY")
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
+                .foregroundStyle(AppTheme.accent)
+
+            Text("Today")
+                .font(AppTheme.Typography.largeTitle)
+                .foregroundStyle(AppTheme.primaryText)
 
             Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide))
-                .font(.subheadline)
+                .font(AppTheme.Typography.secondary)
                 .foregroundStyle(AppTheme.secondaryText)
+
+            Text(greeting(for: now))
+                .font(.caption.weight(.medium))
+                .foregroundStyle(AppTheme.mutedText)
         }
         .accessibilityElement(children: .combine)
     }
@@ -191,12 +223,12 @@ struct TodayView: View {
     private func nowCard(for activity: Activity, now: Date) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("NOW")
-                .font(.caption.weight(.bold))
-                .tracking(1.3)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
                 .foregroundStyle(AppTheme.accent)
 
             Text(activity.title)
-                .font(.title2.weight(.bold))
+                .font(AppTheme.Typography.cardTitle)
                 .foregroundStyle(AppTheme.primaryText)
 
             HStack(spacing: 14) {
@@ -215,9 +247,7 @@ struct TodayView: View {
             .foregroundStyle(AppTheme.secondaryText)
 
             if let remaining = ActivityTiming.remainingSeconds(for: activity, at: now) {
-                Text(ActivityTiming.remainingText(seconds: remaining))
-                    .font(.system(.title, design: .rounded).weight(.bold))
-                    .monospacedDigit()
+                InitiumRemainingMetric(seconds: remaining)
             } else {
                 Text(InitiumLocalization.string("today.planned_at", activity.scheduledStartAt.formatted(date: .omitted, time: .shortened)))
                     .font(.subheadline.weight(.medium))
@@ -237,7 +267,7 @@ struct TodayView: View {
             .buttonStyle(InitiumPrimaryButtonStyle())
             .controlSize(.large)
         }
-        .initiumCard()
+        .initiumCard(padding: 26)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(InitiumLocalization.string("today.now.accessibility", activity.title))
     }
@@ -284,47 +314,77 @@ struct TodayView: View {
     }
 
     private func nextSection(activity: Activity, now: Date) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: InitiumSpacing.md) {
             Text("NEXT")
-                .font(.caption.weight(.bold))
-                .tracking(1.3)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
                 .foregroundStyle(AppTheme.secondaryText)
 
-            Button {
-                edit(activity)
-            } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(activity.title)
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(AppTheme.primaryText)
-
-                        Text(activity.scheduledStartAt, format: .dateTime.hour().minute())
-                            .font(.subheadline.monospacedDigit())
-                            .foregroundStyle(AppTheme.secondaryText)
-
-                        if let calibration = routineCalibration(for: activity) {
-                            Text(InitiumLocalization.string("today.preparation_approx", ActivityTiming.durationText(seconds: calibration.recommendedDurationSeconds)))
-                                .font(.caption)
-                                .foregroundStyle(AppTheme.mutedText)
-                        }
-                    }
-
-                    Spacer()
-
-                    if calendar.isDateInToday(selectedDate) {
-                        Text(relativeTime(from: now, to: activity.scheduledStartAt))
-                            .font(.caption.weight(.medium))
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: InitiumSpacing.sm) {
+                    nextCard(activity: activity, now: now)
+                    rhythmCard(for: activity)
                 }
-                .contentShape(Rectangle())
+                VStack(spacing: InitiumSpacing.sm) {
+                    nextCard(activity: activity, now: now)
+                    rhythmCard(for: activity)
+                }
             }
-            .buttonStyle(.plain)
 
             transitionSummary(for: activity, now: now)
         }
-        .initiumCard()
+        .initiumCard(padding: 18)
+    }
+
+    private func nextCard(activity: Activity, now: Date) -> some View {
+        Button {
+            edit(activity)
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(activity.scheduledStartAt, format: .dateTime.hour().minute())
+                    .font(AppTheme.Typography.metricLarge)
+                    .monospacedDigit()
+                    .foregroundStyle(AppTheme.primaryText)
+
+                Text(activity.title)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(AppTheme.primaryText)
+                    .lineLimit(2)
+
+                if calendar.isDateInToday(selectedDate) {
+                    Text(relativeTime(from: now, to: activity.scheduledStartAt))
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 132, alignment: .topLeading)
+            .padding(18)
+            .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.large))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func rhythmCard(for activity: Activity) -> some View {
+        let calibration = routineCalibration(for: activity)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("RHYTHM")
+                .font(AppTheme.Typography.caption)
+                .tracking(1.5)
+                .foregroundStyle(AppTheme.mutedText)
+
+            Text(calibration.map { ActivityTiming.durationText(seconds: $0.recommendedDurationSeconds) } ?? "—")
+                .font(AppTheme.Typography.metricLarge)
+                .monospacedDigit()
+                .foregroundStyle(AppTheme.primaryText)
+
+            Text(LocalizedStringKey(calibration == nil ? "Pas encore calibré" : "habituellement"))
+                .font(.caption)
+                .foregroundStyle(AppTheme.secondaryText)
+        }
+        .frame(maxWidth: .infinity, minHeight: 132, alignment: .topLeading)
+        .padding(18)
+        .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.large))
     }
 
     @ViewBuilder
@@ -378,8 +438,8 @@ struct TodayView: View {
     private func timeline(now: Date) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("TODAY")
-                .font(.caption.weight(.bold))
-                .tracking(1.3)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
                 .foregroundStyle(AppTheme.secondaryText)
 
             if dayActivities.isEmpty {
@@ -455,6 +515,7 @@ struct TodayView: View {
 
     private func start(_ activity: Activity) {
         do {
+            InitiumHaptics.selection()
             try ActivityExecutionService().start(
                 activity: activity,
                 at: .now,
@@ -481,6 +542,7 @@ struct TodayView: View {
 
     private func startTransition(_ activity: Activity, at date: Date) {
         do {
+            InitiumHaptics.selection()
             try TransitionExecutionService().start(
                 activity: activity,
                 at: date,
@@ -633,13 +695,13 @@ private struct ActivityTimelineRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Text(activity.scheduledStartAt, format: .dateTime.hour().minute())
-                .font(.subheadline.monospacedDigit())
+                .font(.body.weight(.semibold).monospacedDigit())
                 .foregroundStyle(isCurrent ? AppTheme.accent : AppTheme.secondaryText)
                 .frame(width: 54, alignment: .leading)
 
             Capsule()
-                .fill(isCurrent ? AppTheme.accent : Color.secondary.opacity(0.30))
-                .frame(width: 4, height: 38)
+                .fill(isCurrent ? AppTheme.accent : AppTheme.border)
+                .frame(width: 4, height: 46)
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
@@ -649,7 +711,7 @@ private struct ActivityTimelineRow: View {
                     }
 
                     Text(activity.title)
-                        .font(.body.weight(isCurrent ? .semibold : .regular))
+                        .font(.body.weight(isCurrent ? .semibold : .medium))
                         .foregroundStyle(activity.status == .completed ? AppTheme.secondaryText : AppTheme.primaryText)
                         .strikethrough(activity.status == .completed)
                 }
@@ -674,6 +736,9 @@ private struct ActivityTimelineRow: View {
                 .font(.caption)
                 .foregroundStyle(AppTheme.secondaryText)
         }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 10)
+        .background(isCurrent ? AppTheme.surfaceElevated : Color.clear, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
         .accessibilityLabel(InitiumLocalization.string("today.timeline.accessibility", activity.title, activity.scheduledStartAt.formatted(date: .omitted, time: .shortened), statusText))

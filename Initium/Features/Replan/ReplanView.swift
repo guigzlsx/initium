@@ -46,11 +46,13 @@ struct ReplanView: View {
         NavigationStack {
             ScrollView {
                 content
-                    .padding()
+                    .padding(.horizontal, AppTheme.screenHorizontalPadding)
+                    .padding(.top, InitiumSpacing.md)
+                    .padding(.bottom, InitiumSpacing.xl)
             }
             .scrollIndicators(.hidden)
             .initiumScreen()
-            .navigationTitle("Réorganiser")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -92,9 +94,13 @@ struct ReplanView: View {
 
     private var appliedContent: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label("Plan mis à jour", systemImage: "checkmark.circle.fill")
-                .font(.title2.weight(.bold))
+            Text("PLAN MIS À JOUR")
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
                 .foregroundStyle(AppTheme.accent)
+
+            Label("Plan mis à jour", systemImage: "checkmark.circle.fill")
+                .font(AppTheme.Typography.largeTitle)
 
             Text("La suite de ta journée reflète maintenant la réalité.")
                 .foregroundStyle(AppTheme.secondaryText)
@@ -121,9 +127,14 @@ struct ReplanView: View {
     @ViewBuilder
     private func proposalContent(_ proposal: ReplanProposal) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("RESET MY DAY")
+                    .font(AppTheme.Typography.caption)
+                    .tracking(1.8)
+                    .foregroundStyle(AppTheme.accent)
+
                 Text(proposal.hasChanges ? "Ta journée a changé." : "Tout tient encore dans ta journée.")
-                    .font(.largeTitle.weight(.bold))
+                    .font(AppTheme.Typography.largeTitle)
 
                 Text(
                     proposal.hasChanges
@@ -132,7 +143,7 @@ struct ReplanView: View {
                 )
                 .foregroundStyle(AppTheme.secondaryText)
             }
-            .initiumCard()
+            .initiumCard(padding: 28)
 
             if proposal.hasChanges {
                 changeList(proposal)
@@ -151,8 +162,8 @@ struct ReplanView: View {
     private func changeList(_ proposal: ReplanProposal) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("NOUVEAU PLAN")
-                .font(.caption.weight(.bold))
-                .tracking(1.3)
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
                 .foregroundStyle(AppTheme.secondaryText)
 
             ForEach(visibleChanges(from: proposal)) { change in
@@ -167,10 +178,11 @@ struct ReplanView: View {
     }
 
     private func changeRow(_ change: ReplanChange, conflict: ReplanConflict?) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text(change.title)
-                    .font(.headline)
+                    .font(AppTheme.Typography.cardTitle)
+                    .foregroundStyle(AppTheme.primaryText)
                 Spacer()
                 if change.isFixedTime {
                     Text("Horaire fixe")
@@ -184,16 +196,41 @@ struct ReplanView: View {
                     .font(.subheadline)
                     .foregroundStyle(AppTheme.warmAccent)
             } else if change.action == .shifted {
-                Text(InitiumLocalization.string("replan.shifted_time", formattedTime(change.originalStart), formattedTime(change.proposedStart)))
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundStyle(AppTheme.secondaryText)
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(formattedTime(change.originalStart))
+                            .font(AppTheme.Typography.metricLarge)
+                            .monospacedDigit()
+                        Text("avant")
+                            .font(.caption)
+                            .foregroundStyle(AppTheme.mutedText)
+                    }
+
+                    Image(systemName: "arrow.right")
+                        .foregroundStyle(AppTheme.accent)
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(formattedTime(change.proposedStart))
+                            .font(AppTheme.Typography.metricLarge)
+                            .monospacedDigit()
+                        Text("proposé")
+                            .font(.caption)
+                            .foregroundStyle(AppTheme.secondaryText)
+                    }
+                }
             } else if change.isFixedTime {
-                Text(InitiumLocalization.string("replan.unchanged_time", formattedTime(change.originalStart)))
-                    .font(.subheadline.monospacedDigit())
+                Text(formattedTime(change.originalStart))
+                    .font(AppTheme.Typography.metricLarge)
+                    .monospacedDigit()
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
-        .padding(.vertical, 3)
+        .padding(20)
+        .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.large))
+        .overlay {
+            RoundedRectangle(cornerRadius: InitiumRadius.large)
+                .stroke(AppTheme.border, lineWidth: 1)
+        }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityDescription(for: change, conflict: conflict))
     }
@@ -316,6 +353,7 @@ struct ReplanView: View {
                 in: modelContext
             )
             didApply = true
+            InitiumHaptics.success()
             updateTransitionNotifications(for: proposal, resolutions: resolutions)
         } catch {
             errorMessage = error.localizedDescription

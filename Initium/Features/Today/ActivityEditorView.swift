@@ -53,14 +53,16 @@ struct ActivityEditorView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.standard) {
+                VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
                     VStack(alignment: .leading, spacing: 12) {
                         InitiumSectionHeader(eyebrow: "ACTIVITÉ")
                         TextField("Titre", text: $title)
-                            .font(.title2.weight(.semibold))
+                            .font(AppTheme.Typography.cardTitle)
                             .textFieldStyle(.plain)
                             .focused($focusedField, equals: .title)
                             .submitLabel(.done)
+                            .padding(16)
+                            .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
                     }
                     .initiumCard()
 
@@ -71,6 +73,7 @@ struct ActivityEditorView: View {
                             selection: $startTime,
                             displayedComponents: .hourAndMinute
                         )
+                        .tint(AppTheme.accent)
                     }
                     .initiumCard()
 
@@ -88,6 +91,8 @@ struct ActivityEditorView: View {
                                 Text("minutes")
                                     .foregroundStyle(AppTheme.secondaryText)
                             }
+                            .padding(16)
+                            .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
                         }
                     }
                     .initiumCard()
@@ -149,7 +154,7 @@ struct ActivityEditorView: View {
                     }
                 }
                 .padding(.horizontal, AppTheme.screenHorizontalPadding)
-                .padding(.vertical, AppTheme.Spacing.standard)
+                .padding(.vertical, InitiumSpacing.md)
             }
             .scrollIndicators(.hidden)
             .initiumScreen()
@@ -222,14 +227,18 @@ struct ActivityEditorView: View {
                     } label: {
                         Text(minutes == 60 ? "1 h" : "\(minutes) min")
                             .font(.subheadline.weight(.medium))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 9)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                             .background(
                                 !usesCustomDuration && durationMinutes == minutes
-                                    ? AppTheme.accent.opacity(0.18)
-                                    : AppTheme.elevatedBackground,
-                                in: Capsule()
+                                    ? AppTheme.accent.opacity(0.16)
+                                    : AppTheme.surfaceElevated,
+                                in: RoundedRectangle(cornerRadius: InitiumRadius.medium)
                             )
+                            .overlay {
+                                RoundedRectangle(cornerRadius: InitiumRadius.medium)
+                                    .stroke(!usesCustomDuration && durationMinutes == minutes ? AppTheme.accent.opacity(0.42) : AppTheme.border, lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
                 }
@@ -239,15 +248,19 @@ struct ActivityEditorView: View {
                     focusedField = .customDuration
                 } label: {
                     Text("Custom")
-                        .font(.subheadline.weight(.medium))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 9)
-                        .background(
-                            usesCustomDuration
-                                ? AppTheme.accent.opacity(0.18)
-                                : AppTheme.elevatedBackground,
-                            in: Capsule()
-                        )
+                            .font(.subheadline.weight(.medium))
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(
+                                usesCustomDuration
+                                    ? AppTheme.accent.opacity(0.18)
+                                    : AppTheme.surfaceElevated,
+                                in: RoundedRectangle(cornerRadius: InitiumRadius.medium)
+                            )
+                            .overlay {
+                                RoundedRectangle(cornerRadius: InitiumRadius.medium)
+                                    .stroke(usesCustomDuration ? AppTheme.accent.opacity(0.42) : AppTheme.border, lineWidth: 1)
+                            }
                 }
                 .buttonStyle(.plain)
             }

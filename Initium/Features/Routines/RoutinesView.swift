@@ -8,41 +8,70 @@ struct RoutinesView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.section) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Routines")
-                            .font(.largeTitle.weight(.bold))
-                        Text("Des préparations simples, prêtes quand tu en as besoin.")
-                            .font(.subheadline)
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
+                VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
+                    pageHeader
 
                     if routines.isEmpty {
-                        ContentUnavailableView(
-                            "Aucune routine",
-                            systemImage: "checklist",
-                            description: Text("Les routines réutilisables apparaîtront ici.")
-                        )
-                        .frame(maxWidth: .infinity, minHeight: 240)
+                        emptyState
                     } else {
-                        ForEach(routines) { routine in
-                            NavigationLink {
-                                RoutineDetailView(routine: routine)
-                            } label: {
-                                RoutineCard(routine: routine)
+                        LazyVGrid(
+                            columns: [GridItem(.adaptive(minimum: 156), spacing: InitiumSpacing.sm)],
+                            spacing: InitiumSpacing.sm
+                        ) {
+                            ForEach(routines) { routine in
+                                NavigationLink {
+                                    RoutineDetailView(routine: routine)
+                                } label: {
+                                    RoutineCard(routine: routine)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                 }
                 .padding(.horizontal, AppTheme.screenHorizontalPadding)
-                .padding(.vertical, AppTheme.Spacing.standard)
+                .padding(.top, InitiumSpacing.md)
+                .padding(.bottom, InitiumSpacing.xl)
             }
             .scrollIndicators(.hidden)
             .initiumScreen()
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+
+    private var pageHeader: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("ROUTINES")
+                .font(AppTheme.Typography.caption)
+                .tracking(1.8)
+                .foregroundStyle(AppTheme.accent)
+
+            Text("Routines")
+                .font(AppTheme.Typography.largeTitle)
+                .foregroundStyle(AppTheme.primaryText)
+
+            Text("Des préparations simples, prêtes quand tu en as besoin.")
+                .font(AppTheme.Typography.secondary)
+                .foregroundStyle(AppTheme.secondaryText)
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: InitiumSpacing.md) {
+            Image(systemName: "checklist")
+                .font(.system(size: 30, weight: .medium))
+                .foregroundStyle(AppTheme.accent)
+
+            Text("Aucune routine")
+                .font(AppTheme.Typography.cardTitle)
+                .foregroundStyle(AppTheme.primaryText)
+
+            Text("Les routines réutilisables apparaîtront ici.")
+                .font(AppTheme.Typography.secondary)
+                .foregroundStyle(AppTheme.secondaryText)
+        }
+        .initiumCard()
     }
 }
 
@@ -53,40 +82,46 @@ private struct RoutineCard: View {
     var body: some View {
         let result = calibration.result(for: routine)
 
-        HStack(spacing: 16) {
-            Image(systemName: routine.icon)
-                .font(.title2.weight(.medium))
-                .foregroundStyle(AppTheme.accent)
-                .frame(width: 48, height: 48)
-                .background(AppTheme.accent.opacity(0.13), in: RoundedRectangle(cornerRadius: 16))
+        VStack(alignment: .leading, spacing: InitiumSpacing.md) {
+            HStack {
+                Image(systemName: routine.icon)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(AppTheme.accent)
+                    .frame(width: 46, height: 46)
+                    .background(AppTheme.accent.opacity(0.14), in: Circle())
 
-            VStack(alignment: .leading, spacing: 7) {
-                Text(routine.name)
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(AppTheme.primaryText)
+                Spacer()
 
                 Text(InitiumLocalization.string("routine.steps", routine.orderedSteps.count))
-                    .font(.subheadline)
-                    .foregroundStyle(AppTheme.secondaryText)
-
-                if result.hasEnoughHistory {
-                    Text(InitiumLocalization.string("routine.average_duration", ActivityTiming.durationText(seconds: result.recommendedDurationSeconds)))
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(AppTheme.warmAccent)
-                } else {
-                    Text(InitiumLocalization.string("routine.estimated_duration", ActivityTiming.durationText(seconds: result.estimatedDurationSeconds)))
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(AppTheme.mutedText)
-                }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(AppTheme.mutedText)
             }
 
-            Spacer()
+            Text(routine.name)
+                .font(AppTheme.Typography.cardTitle)
+                .foregroundStyle(AppTheme.primaryText)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
 
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppTheme.mutedText)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(ActivityTiming.durationText(seconds: result.recommendedDurationSeconds))
+                    .font(AppTheme.Typography.metricLarge)
+                    .monospacedDigit()
+                    .foregroundStyle(AppTheme.primaryText)
+
+                Text(LocalizedStringKey(result.hasEnoughHistory ? "temps réel moyen" : "estimation initiale"))
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+
+            if result.hasEnoughHistory {
+                Text(InitiumLocalization.string("routine.sessions", result.observationCount))
+                    .font(.caption2)
+                    .foregroundStyle(AppTheme.mutedText)
+            }
         }
-        .initiumCard()
+        .frame(maxWidth: .infinity, minHeight: 220, alignment: .topLeading)
+        .initiumCard(padding: 18)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(routineAccessibilityLabel(result))
     }

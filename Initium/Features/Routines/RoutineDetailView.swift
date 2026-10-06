@@ -8,95 +8,125 @@ struct RoutineDetailView: View {
         let result = calibration.result(for: routine)
 
         ScrollView {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.section) {
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack {
-                        Image(systemName: routine.icon)
-                            .font(.title2)
-                            .foregroundStyle(AppTheme.accent)
+            VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
+                hero(result: result)
 
-                        Spacer()
-
-                        Text(InitiumLocalization.string("routine.steps", routine.orderedSteps.count))
-                            .font(.subheadline.weight(.medium))
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
-
-                    Text(routine.name)
-                        .font(.largeTitle.weight(.bold))
-
-                    if result.hasEnoughHistory {
-                        HStack(spacing: 28) {
-                            InitiumMetric(
-                                label: "temps réel moyen",
-                                value: ActivityTiming.durationText(seconds: result.recommendedDurationSeconds),
-                                detail: InitiumLocalization.string("routine.sessions", result.observationCount)
-                            )
-                            InitiumMetric(
-                                label: "estimation initiale",
-                                value: ActivityTiming.durationText(seconds: result.estimatedDurationSeconds)
-                            )
-                        }
-                    } else {
-                        Text(InitiumLocalization.string("routine.estimated_duration_full", ActivityTiming.durationText(seconds: result.estimatedDurationSeconds)))
-                            .font(.title2.weight(.bold))
-                        Text("La durée habituelle apparaîtra après 3 préparations terminées.")
-                            .font(.subheadline)
-                            .foregroundStyle(AppTheme.secondaryText)
-                    }
-                }
-                .initiumCard()
-
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: InitiumSpacing.md) {
                     InitiumSectionHeader(eyebrow: "ÉTAPES")
 
                     ForEach(routine.orderedSteps) { step in
                         HStack(spacing: 14) {
                             Text("\(step.order + 1)")
-                                .font(.subheadline.weight(.bold).monospacedDigit())
+                                .font(.caption.weight(.bold).monospacedDigit())
                                 .foregroundStyle(AppTheme.accent)
-                                .frame(width: 30, height: 30)
-                                .background(AppTheme.accent.opacity(0.12), in: Circle())
+                                .frame(width: 34, height: 34)
+                                .background(AppTheme.accent.opacity(0.14), in: Circle())
 
-                            Text(step.title)
-                                .font(.body.weight(.semibold))
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(step.title)
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(AppTheme.primaryText)
+                                Text(ActivityTiming.durationText(seconds: step.estimatedDurationSeconds))
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.secondaryText)
+                            }
 
                             Spacer()
-
-                            Text(ActivityTiming.durationText(seconds: step.estimatedDurationSeconds))
-                                .font(.subheadline.monospacedDigit())
-                                .foregroundStyle(AppTheme.secondaryText)
                         }
-                        .frame(minHeight: 44)
+                        .padding(.vertical, 4)
                     }
                 }
                 .initiumCard()
 
                 if result.recentDurationsSeconds.count >= 3 {
-                    VStack(alignment: .leading, spacing: 14) {
-                        InitiumSectionHeader(eyebrow: "HISTORIQUE")
-
-                        ForEach(Array(result.recentDurationsSeconds.enumerated()), id: \.offset) { _, duration in
-                            HStack {
-                                Text(ActivityTiming.durationText(seconds: duration))
-                                    .font(.title3.weight(.bold))
-                                    .monospacedDigit()
-                                Spacer()
-                                Text(InitiumLocalization.string("routine.preparation_label"))
-                                    .font(.caption)
-                                    .foregroundStyle(AppTheme.mutedText)
-                            }
-                        }
-                    }
-                    .initiumCard()
+                    historyCard(result: result)
                 }
             }
             .padding(.horizontal, AppTheme.screenHorizontalPadding)
-            .padding(.vertical, AppTheme.Spacing.standard)
+            .padding(.top, InitiumSpacing.md)
+            .padding(.bottom, InitiumSpacing.xl)
         }
         .scrollIndicators(.hidden)
         .initiumScreen()
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func hero(result: RoutineCalibrationResult) -> some View {
+        VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
+            HStack {
+                Image(systemName: routine.icon)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(AppTheme.accent)
+                    .frame(width: 48, height: 48)
+                    .background(AppTheme.accent.opacity(0.14), in: Circle())
+
+                Spacer()
+
+                Text(InitiumLocalization.string("routine.steps", routine.orderedSteps.count))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(AppTheme.mutedText)
+            }
+
+            Text(routine.name)
+                .font(AppTheme.Typography.largeTitle)
+                .foregroundStyle(AppTheme.primaryText)
+
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    metrics(result: result)
+                }
+                VStack(spacing: 12) {
+                    metrics(result: result)
+                }
+            }
+
+            if !result.hasEnoughHistory {
+                Text("La durée habituelle apparaîtra après 3 préparations terminées.")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+        .initiumCard()
+    }
+
+    @ViewBuilder
+    private func metrics(result: RoutineCalibrationResult) -> some View {
+        InitiumMetricCard(
+            label: "estimation initiale",
+            value: ActivityTiming.durationText(seconds: result.estimatedDurationSeconds)
+        )
+
+        InitiumMetricCard(
+            label: "temps réel moyen",
+            value: result.hasEnoughHistory
+                ? ActivityTiming.durationText(seconds: result.recommendedDurationSeconds)
+                : "—",
+            detail: result.hasEnoughHistory
+                ? InitiumLocalization.string("routine.sessions", result.observationCount)
+                : nil
+        )
+    }
+
+    private func historyCard(result: RoutineCalibrationResult) -> some View {
+        VStack(alignment: .leading, spacing: InitiumSpacing.md) {
+            InitiumSectionHeader(eyebrow: "HISTORIQUE")
+
+            ForEach(Array(result.recentDurationsSeconds.enumerated()), id: \.offset) { _, duration in
+                HStack {
+                    Text(ActivityTiming.durationText(seconds: duration))
+                        .font(.title3.weight(.bold))
+                        .monospacedDigit()
+                        .foregroundStyle(AppTheme.primaryText)
+
+                    Spacer()
+
+                    Text(InitiumLocalization.string("routine.preparation_label"))
+                        .font(.caption)
+                        .foregroundStyle(AppTheme.mutedText)
+                }
+            }
+        }
+        .initiumCard()
     }
 }

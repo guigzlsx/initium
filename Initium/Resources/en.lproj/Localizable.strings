@@ -175,6 +175,8 @@
 "duration.minutes.remaining" = "%d min left";
 "duration.minutes.seconds.remaining" = "%d min %d sec left";
 "duration.seconds.remaining" = "%d sec left";
+"duration.remaining_label" = "left";
+"duration.accessibility.remaining" = "%@ left";
 "error.activity.active" = "An activity is already in progress: %@.";
 "error.activity.no_active_session" = "No active session is available.";
 "error.routine.no_step" = "This routine has no remaining step.";
@@ -209,6 +211,17 @@
 "recovery.missing_session" = "%@ has no active session recorded.";
 "now.completed_steps" = "%d steps out of %d";
 "now.next_activity" = "%@\n%@";
+"now.ready_for" = "Ready for %@";
+"now.preparation_late" = "Preparation was planned around %@. You can start now.";
+"now.preparation_accessibility" = "Preparation for %@";
+"now.step_progress" = "Step %d of %d";
+"now.step_accessibility" = "Step %d of %d, %@";
+"now.step_duration_accessibility" = "Step %d of %d, %@, estimated duration %@";
+"now.current_accessibility" = "Current activity: %@";
+"now.planned_at" = "Planned at %@";
+"now.elapsed" = "%@ completed";
+"now.over_by" = "%@ beyond the planned time";
+"now.next_accessibility" = "Next: %@ at %@";
 "routine.sessions" = "%d sessions";
 "routine.estimated_duration_full" = "%@ estimated";
 "routine.preparation_label" = "preparation";
@@ -232,3 +245,92 @@
 "insights.overall_learning_accessibility" = "Your time. Initium is still learning your rhythm.";
 "insights.overall_accessibility" = "Your time. Average planned %@. Actual %@. Based on %d activities.";
 "insights.start_accessibility" = "%@ Based on %d starts.";
+
+/* Entry flow */
+"entry.welcome.eyebrow" = "INITIUM";
+"entry.welcome.title" = "Plan less.\nStart better.";
+"entry.welcome.subtitle" = "Initium helps you start, move between activities, and adapt your day to your real rhythm.";
+"entry.welcome.cta" = "Get started";
+"entry.welcome.cta_hint" = "Start setting up your Initium space.";
+"entry.back" = "Back";
+"entry.continue" = "Continue";
+"entry.progress.accessibility" = "Onboarding progress";
+"entry.selected" = "Selected";
+"entry.not_selected" = "Not selected";
+
+"onboarding.question.difficulty" = "What feels hardest for you?";
+"onboarding.question.pattern" = "What sounds most like you?";
+"onboarding.question.guidance" = "How would you like Initium to support you?";
+"onboarding.question.goal" = "What would you most like to improve?";
+"onboarding.question.subtitle" = "Choose one answer. You can change it later.";
+"onboarding.finish" = "See what’s ahead";
+"onboarding.difficulty.start" = "Starting a task";
+"onboarding.difficulty.transition" = "Moving from one activity to another";
+"onboarding.difficulty.time" = "Estimating how long something will take";
+"onboarding.difficulty.planning" = "Sticking to my plan";
+"onboarding.difficulty.everything" = "A bit of everything";
+"onboarding.pattern.underestimate" = "I often underestimate time";
+"onboarding.pattern.last_minute" = "I put things off until the last moment";
+"onboarding.pattern.stuck" = "I get stuck in what I’m doing";
+"onboarding.pattern.drift" = "My plan easily goes off track";
+"onboarding.pattern.overwhelmed" = "I feel overwhelmed quickly";
+"onboarding.guidance.simple" = "As simply as possible";
+"onboarding.guidance.reminders" = "With gentle reminders";
+"onboarding.guidance.structure" = "With a little more structure";
+"onboarding.goal.start" = "Start more easily";
+"onboarding.goal.ready" = "Be ready on time";
+"onboarding.goal.estimate" = "Estimate my time better";
+"onboarding.goal.recover" = "Keep one change from derailing my whole day";
+"onboarding.goal.rhythm" = "Understand my rhythm better";
+
+"entry.summary.eyebrow" = "YOUR STARTING POINT";
+"entry.summary.title" = "Initium is ready for you.";
+"entry.summary.personalized.start" = "Initium will help you move from “I need to do it” to “I’m starting”.";
+"entry.summary.personalized.transition" = "Initium will make moving between activities feel simpler.";
+"entry.summary.personalized.time" = "Initium will help you compare imagined time with time as it really happens.";
+"entry.summary.personalized.default" = "A calm space to move with the reality of your day.";
+"entry.summary.benefit.start" = "Start at the right moment";
+"entry.summary.benefit.transition" = "Prepare for transitions";
+"entry.summary.benefit.reset" = "Reorganize your day when it changes";
+"entry.summary.benefit.rhythm" = "Learn your real rhythm";
+"entry.summary.cta" = "Continue";
+
+"entry.paywall.badge" = "INITIUM PLUS";
+"entry.paywall.title" = "Keep your rhythm with you.";
+"entry.paywall.subtitle" = "A complete space to turn intentions into moments you can actually live.";
+"entry.paywall.benefit.transition" = "Guided transitions";
+"entry.paywall.benefit.reset" = "Reset My Day";
+"entry.paywall.benefit.routines" = "Unlimited routines";
+"entry.paywall.benefit.calibration" = "Local rhythm calibration";
+"entry.paywall.benefit.insights" = "Simple, local insights";
+"entry.paywall.annual" = "Annual";
+"entry.paywall.monthly" = "Monthly";
+"entry.paywall.coming_soon" = "Coming soon";
+"entry.paywall.annual_price" = "€29.99 / year";
+"entry.paywall.monthly_price" = "€4.99 / month";
+"entry.paywall.recommended" = "Recommended";
+"entry.paywall.recommended_badge" = "RECOMMENDED";
+"entry.paywall.cta" = "Continue";
+"entry.paywall.restore" = "Restore purchases";
+"entry.paywall.restore_hint" = "Purchase restoration will be available later.";
+"entry.paywall.placeholder_note" = "Purchases will be available in a future version.";
+
+"entry.account.title" = "Save your journey";
+"entry.account.subtitle" = "Create an account to keep your profile and prepare for future sync.";
+"entry.account.apple" = "Continue with Apple";
+"entry.account.email" = "Continue with email";
+"entry.account.local_note" = "For now, your journey stays local on this device.";
+
+"DEBUG" = "DEBUG";
+"Réinitialiser l'entrée" = "Reset entry flow";
+
+/* Visual system */
+"ROUTINES" = "ROUTINES";
+"RHYTHM" = "RHYTHM";
+"Pas encore calibré" = "Not calibrated yet";
+"habituellement" = "usually";
+"avant" = "before";
+"proposé" = "proposed";
+"SETTINGS" = "SETTINGS";
+"PLAN MIS À JOUR" = "PLAN UPDATED";
+"RESET MY DAY" = "RESET MY DAY";

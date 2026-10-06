@@ -8,14 +8,14 @@ struct InitiumCalibrationCard: View {
     let onUseRecommendation: (() -> Void)?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: InitiumSpacing.md) {
             HStack(spacing: 8) {
                 Image(systemName: "waveform.path.ecg")
                     .foregroundStyle(AppTheme.warmAccent)
 
                 Text("CALIBRATION LOCALE")
-                    .font(.caption.weight(.bold))
-                    .tracking(1.2)
+                    .font(AppTheme.Typography.caption)
+                    .tracking(1.7)
                     .foregroundStyle(AppTheme.mutedText)
             }
 
@@ -43,10 +43,10 @@ struct InitiumCalibrationCard: View {
                     .buttonStyle(InitiumSecondaryButtonStyle())
             }
         }
-        .padding(16)
-        .background(AppTheme.elevatedBackground, in: RoundedRectangle(cornerRadius: AppTheme.controlCornerRadius))
+        .padding(20)
+        .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.large))
         .overlay {
-            RoundedRectangle(cornerRadius: AppTheme.controlCornerRadius)
+            RoundedRectangle(cornerRadius: InitiumRadius.large)
                 .stroke(AppTheme.border, lineWidth: 1)
         }
         .accessibilityElement(children: .contain)
@@ -70,7 +70,7 @@ struct InitiumProgressBar: View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(AppTheme.elevatedBackground)
+                    .fill(AppTheme.surfaceElevated)
                 Capsule()
                     .fill(AppTheme.accent)
                     .frame(width: proxy.size.width * min(max(progress, 0), 1))
