@@ -1,11 +1,16 @@
-# Initium — données et confidentialité
+# Confidentialité — Calendrier
 
-Initium fonctionne localement sur l’appareil.
+Initium peut accéder aux calendriers de l’iPhone uniquement après une action
+explicite de l’utilisateur et l’autorisation système correspondante.
 
-- Les activités, routines et sessions sont enregistrées dans SwiftData sur l’iPhone.
-- Aucune donnée d’activité n’est envoyée à un serveur.
-- Initium ne demande aucun compte et n’intègre aucun SDK d’analytics tiers.
-- Les rappels sont des notifications locales programmées sur l’appareil.
-- La suppression depuis Réglages efface les activités, routines, sessions et rappels locaux.
+Dans ce lot, l’accès est strictement en lecture seule via EventKit :
 
-Une future synchronisation iCloud ou intégration calendrier devra faire l’objet d’un choix explicite et d’une mise à jour distincte de cette documentation.
+- les calendriers sélectionnés et leurs événements sont lus localement ;
+- les événements servent à afficher la journée, calculer les transitions et
+  planifier des rappels locaux ;
+- aucune donnée de calendrier n’est envoyée à un serveur ;
+- aucune donnée n’est partagée avec des tiers ;
+- Initium ne modifie, ne crée et ne supprime aucun événement Apple Calendar.
+
+Les réglages, associations de routines et métadonnées d’exécution restent
+stockés localement sur l’appareil.

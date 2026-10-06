@@ -24,9 +24,11 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var entryFlow: EntryFlowViewModel
     @AppStorage("initium.appearance") private var appearance = InitiumAppearance.system.rawValue
+    @AppStorage("initium.calendar.enabled") private var calendarEnabled = false
 
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
     @State private var showingDeleteConfirmation = false
+    @State private var showingCalendarSettings = false
     @State private var errorMessage: String?
 
     var body: some View {
@@ -75,6 +77,33 @@ struct SettingsView: View {
                             }
                             .buttonStyle(InitiumSecondaryButtonStyle())
                         }
+                    }
+
+                    settingsCard(eyebrow: "CALENDRIER") {
+                        HStack(spacing: 12) {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(AppTheme.accent)
+
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(LocalizedStringKey("calendar.settings.title"))
+                                    .font(.body.weight(.semibold))
+
+                                Text(LocalizedStringKey(calendarEnabled ? "calendar.connected" : "calendar.not_connected"))
+                                    .font(.caption)
+                                    .foregroundStyle(AppTheme.secondaryText)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(AppTheme.mutedText)
+                        }
+
+                        Button(LocalizedStringKey(calendarEnabled ? "calendar.manage" : "calendar.connect.button")) {
+                            showingCalendarSettings = true
+                        }
+                        .buttonStyle(InitiumSecondaryButtonStyle())
                     }
 
                     settingsCard(eyebrow: "DONNÉES ET CONFIDENTIALITÉ") {
@@ -126,6 +155,9 @@ struct SettingsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Terminé") { dismiss() }
                 }
+            }
+            .sheet(isPresented: $showingCalendarSettings) {
+                CalendarSettingsView()
             }
             .confirmationDialog(
                 "Effacer toutes tes données ?",

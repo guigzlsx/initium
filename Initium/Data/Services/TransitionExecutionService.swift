@@ -86,6 +86,7 @@ struct TransitionExecutionService {
 
         finish(session: session, at: date)
         try context.save()
+        refreshNotification(for: activity, at: date)
     }
 
     @MainActor
@@ -141,6 +142,7 @@ struct TransitionExecutionService {
         }
 
         try context.save()
+        refreshNotification(for: activity, at: date)
         return didComplete
     }
 
@@ -151,5 +153,18 @@ struct TransitionExecutionService {
             0,
             Int(session.endedAt!.timeIntervalSince(session.startedAt))
         )
+    }
+
+    private func refreshNotification(for activity: Activity, at date: Date) {
+        Task { @MainActor in
+            let scheduler = LocalNotificationScheduler()
+            guard await scheduler.isAuthorized(),
+                  let plan = TransitionPlanner().makePlan(for: activity) else {
+                scheduler.remove(for: activity)
+                return
+            }
+
+            try? await scheduler.schedule(for: activity, plan: plan, now: date)
+        }
     }
 }

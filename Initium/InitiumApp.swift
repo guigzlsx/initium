@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Foundation
+import EventKit
 
 @main
 struct InitiumApp: App {
@@ -48,7 +49,10 @@ struct InitiumApp: App {
 
 private struct InitiumRootView: View {
     @EnvironmentObject private var entryFlow: EntryFlowViewModel
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @StateObject private var calendarSyncCoordinator = CalendarSyncCoordinator()
 
     var body: some View {
         Group {
@@ -59,6 +63,20 @@ private struct InitiumRootView: View {
             }
         }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: entryFlow.state)
+        .task {
+            await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            Task {
+                await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .EKEventStoreChanged)) { _ in
+            Task {
+                await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
+            }
+        }
     }
 }
 

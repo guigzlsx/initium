@@ -7,13 +7,17 @@ struct DayStateResolver {
         }
 
         if let explicitlyActive = orderedActivities.first(where: {
-            $0.status == .inProgress || $0.status == .paused
+            !$0.externalIsAllDay &&
+            !$0.isExternallyDeleted &&
+            ($0.status == .inProgress || $0.status == .paused)
         }) {
             return explicitlyActive
         }
 
         return orderedActivities.first(where: { activity in
             !isTerminal(activity.status) &&
+            !activity.externalIsAllDay &&
+            !activity.isExternallyDeleted &&
             activity.status == .planned &&
             activity.scheduledStartAt <= now
         })
@@ -21,7 +25,12 @@ struct DayStateResolver {
 
     func nextActivity(from activities: [Activity], now: Date) -> Activity? {
         activities
-            .filter { !isTerminal($0.status) && $0.scheduledStartAt > now }
+            .filter {
+                !isTerminal($0.status) &&
+                !$0.externalIsAllDay &&
+                !$0.isExternallyDeleted &&
+                $0.scheduledStartAt > now
+            }
             .sorted { $0.scheduledStartAt < $1.scheduledStartAt }
             .first
     }

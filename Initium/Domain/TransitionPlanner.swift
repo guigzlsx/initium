@@ -48,7 +48,9 @@ struct TransitionPlanner {
 
     func makePlan(for activity: Activity) -> TransitionPlan? {
         guard let routine = activity.routine,
-              !routine.orderedSteps.isEmpty else {
+              !routine.orderedSteps.isEmpty,
+              !activity.externalIsAllDay,
+              !activity.isExternallyDeleted else {
             return nil
         }
 

@@ -33,6 +33,8 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: Initium
         INFOPLIST_KEY_UILaunchScreen_Generation: true
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: true
+        INFOPLIST_KEY_NSCalendarsUsageDescription: "Initium lit ton calendrier pour t’aider à te préparer à temps."
+        INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Initium lit ton calendrier pour afficher tes événements et préparer tes transitions."
         SWIFT_EMIT_LOC_STRINGS: true
     scheme:
       testTargets:

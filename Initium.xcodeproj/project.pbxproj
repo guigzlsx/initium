@@ -46,14 +46,17 @@
 		992CD13BCB79299667721C45 /* ReplanPersistenceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94AE692F0C3E13483552CEE5 /* ReplanPersistenceService.swift */; };
 		9B7E315D5E18905A387DD1B5 /* Routine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3001798F059B31A77CB7100A /* Routine.swift */; };
 		A1031692711F72FA408CD309 /* InitiumLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = D373C712C0DA554DA3DF9A26 /* InitiumLocalization.swift */; };
+		A224B290221DD37264C675B2 /* CalendarIntegrationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 698DD2C942386DF452A8AD28 /* CalendarIntegrationViewModel.swift */; };
 		A2D13B46495732542835A18A /* PersistenceConsistency.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC9CD3FD8CD586D7E93B3120 /* PersistenceConsistency.swift */; };
 		A419EEF0CA4CCF474045D655 /* AppFlowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB7D8F7861DDEB8BF0B79CD /* AppFlowState.swift */; };
 		ACAB2BE86D6D2AA08C785BF3 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE6D9342E97F59F7EE78496 /* PersistenceController.swift */; };
 		ACBF895DD1F6C68E152381F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D7AF0B0BC85BF6822D71FD92 /* Assets.xcassets */; };
+		AD7352B65062E6FC17EAE95A /* CalendarIntegrationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23A3329A578DF34496CA5167 /* CalendarIntegrationService.swift */; };
 		ADA88992208846F8BECC6DCF /* ReplanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0CB24324E962989432118C0 /* ReplanView.swift */; };
 		AF8FA57D506A9491EBF3D29A /* RoutineCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373E73529EBB08BB8E631F69 /* RoutineCalibration.swift */; };
 		B06E0716FE8AE386D8E15482 /* RoutineSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3EA1C355162593B6C0138C /* RoutineSession.swift */; };
 		B2FD6FA7D19D355C75CAA0BC /* ActivitySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2391315EA5DD27AD9E2AD064 /* ActivitySession.swift */; };
+		B36DC8FCDDC15D9047A23D2F /* CalendarSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDD6254743F87BFCB2C14740 /* CalendarSyncService.swift */; };
 		B7A7E31195E153D3AA5B5B1A /* ActivityTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003DB62D0FEB83278B5FEAFE /* ActivityTiming.swift */; };
 		BE0C30D0B92B8704E7B1FFAD /* ActivityEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EF6A79D396169FC19DB14A2 /* ActivityEditorView.swift */; };
 		BE292BB4D40EFC08BF8886CB /* RoutineDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41797FC299B8C6FC01AC8D1 /* RoutineDetailView.swift */; };
@@ -68,9 +71,12 @@
 		E2F796CD03881E45E01208A2 /* ExecutionRecoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124756EB90D556CC3B59287C /* ExecutionRecoveryService.swift */; };
 		E44E548A4BD451BBA4DC9254 /* LocalNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C122C0058ACF88A005741E0 /* LocalNotificationScheduler.swift */; };
 		E4672C3DB2A59B63C5D811CA /* InitiumCalibration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180B8964AFAE49F1FA91CA3D /* InitiumCalibration.swift */; };
+		E4925EDFFE6EB07E39545372 /* CalendarSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E42F308F27FDB8181C257E /* CalendarSyncServiceTests.swift */; };
 		E5BE85D2BD01297F44EC3604 /* DataMaintenanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 885D69BC4279C01B1AE0BA32 /* DataMaintenanceService.swift */; };
 		ECEDF009CEDFFECF6332DA67 /* RoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C27D5AE565420EF12A50502 /* RoutinesView.swift */; };
 		F13B11C515DEA6DD533E2214 /* EntryFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76CE041038FC194FE83B85C7 /* EntryFlowView.swift */; };
+		F1481DD34DACE065AB40201D /* CalendarSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D601DF698A1A7C62F30E40 /* CalendarSettingsView.swift */; };
+		F2FD98DDD08E0EE96D6559C7 /* ActivitySourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B1D2805B598068302E4E154 /* ActivitySourceType.swift */; };
 		FBC5911137F6BA8489EC0272 /* EntryFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E678D8909131826346E0E6 /* EntryFlowViewModel.swift */; };
 		FECD812EBCDA006A6D32CD86 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F136D29A883EE03090F9B5 /* InsightsView.swift */; };
 /* End PBXBuildFile section */
@@ -101,6 +107,7 @@
 		20BE8D135D71DBA73AE9C97A /* TransitionStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionStateTests.swift; sourceTree = "<group>"; };
 		21BBFD1F8418226BB3A6DEE8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		2391315EA5DD27AD9E2AD064 /* ActivitySession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySession.swift; sourceTree = "<group>"; };
+		23A3329A578DF34496CA5167 /* CalendarIntegrationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarIntegrationService.swift; sourceTree = "<group>"; };
 		27802E71AB242823689317B0 /* StabilityBoundaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StabilityBoundaryTests.swift; sourceTree = "<group>"; };
 		29965A865C3DA5C8C6FFDEFC /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		2C122C0058ACF88A005741E0 /* LocalNotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationScheduler.swift; sourceTree = "<group>"; };
@@ -117,6 +124,7 @@
 		616EB2424C87B129111429F5 /* RoutineSessionKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineSessionKind.swift; sourceTree = "<group>"; };
 		66181A4E729CEC6BB702FF80 /* InitiumHaptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiumHaptics.swift; sourceTree = "<group>"; };
 		67A79819B2EE89CF9CF9A81D /* DurationEstimatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEstimatorTests.swift; sourceTree = "<group>"; };
+		698DD2C942386DF452A8AD28 /* CalendarIntegrationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarIntegrationViewModel.swift; sourceTree = "<group>"; };
 		6C27D5AE565420EF12A50502 /* RoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutinesView.swift; sourceTree = "<group>"; };
 		6ECBDF06E0393E0BD70AC99B /* NowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowViewModel.swift; sourceTree = "<group>"; };
 		7318D5145818957B436BCB77 /* ScheduleReplannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleReplannerTests.swift; sourceTree = "<group>"; };
@@ -126,6 +134,7 @@
 		9050A3363F65E64F23234835 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		94AE692F0C3E13483552CEE5 /* ReplanPersistenceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplanPersistenceService.swift; sourceTree = "<group>"; };
 		970F5CF028B53A69EF8B86C8 /* ActivityExecutionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExecutionServiceTests.swift; sourceTree = "<group>"; };
+		9B1D2805B598068302E4E154 /* ActivitySourceType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySourceType.swift; sourceTree = "<group>"; };
 		A3C1B7748E07C11644197620 /* OnboardingPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPreferences.swift; sourceTree = "<group>"; };
 		A67FE431E7EE07A979B27D33 /* RoutineStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineStep.swift; sourceTree = "<group>"; };
 		AAE6D9342E97F59F7EE78496 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
@@ -134,6 +143,7 @@
 		B2F136D29A883EE03090F9B5 /* InsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
 		B4F856D9C5ED6EA3B69D6867 /* DayStateResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStateResolverTests.swift; sourceTree = "<group>"; };
 		B71169FCE19E93BCDDAA837A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B8E42F308F27FDB8181C257E /* CalendarSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSyncServiceTests.swift; sourceTree = "<group>"; };
 		B8E678D8909131826346E0E6 /* EntryFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryFlowViewModel.swift; sourceTree = "<group>"; };
 		BADD9ADECB2448FE62271448 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C0DDDB58154199F54C5ECBC3 /* DurationEstimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationEstimator.swift; sourceTree = "<group>"; };
@@ -146,10 +156,12 @@
 		DA3EA1C355162593B6C0138C /* RoutineSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineSession.swift; sourceTree = "<group>"; };
 		DA8272192CC85C4999DF8F49 /* RoutineExecutionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineExecutionTests.swift; sourceTree = "<group>"; };
 		DB41439BB0C41F3FC8231E30 /* EntryFlowViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryFlowViewModelTests.swift; sourceTree = "<group>"; };
+		E6D601DF698A1A7C62F30E40 /* CalendarSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSettingsView.swift; sourceTree = "<group>"; };
 		E9F0F26FA3FA6846D0388169 /* TransitionExecutionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionExecutionService.swift; sourceTree = "<group>"; };
 		EA40F5172B67EB7DC4933314 /* RoutineCalibrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCalibrationTests.swift; sourceTree = "<group>"; };
 		EB8A4C36E0BAD2EC592ADD9D /* InsightsCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsCalculatorTests.swift; sourceTree = "<group>"; };
 		EC9CD3FD8CD586D7E93B3120 /* PersistenceConsistency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceConsistency.swift; sourceTree = "<group>"; };
+		EDD6254743F87BFCB2C14740 /* CalendarSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSyncService.swift; sourceTree = "<group>"; };
 		EE77EF1FBD093F17A82D92F8 /* NowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowView.swift; sourceTree = "<group>"; };
 		F0CB24324E962989432118C0 /* ReplanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplanView.swift; sourceTree = "<group>"; };
 		F301922FAF655176A4A96D3F /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -170,6 +182,7 @@
 			isa = PBXGroup;
 			children = (
 				80519851D5CABA31E897E1BD /* Account */,
+				52B150859E78D902C481769F /* Calendar */,
 				20FB61B90EBB8B2DB9713CC4 /* EntryFlow */,
 				906745C46CEDD1CB7D3946EE /* Insights */,
 				114203CC239DE625973676D3 /* Now */,
@@ -197,6 +210,8 @@
 			isa = PBXGroup;
 			children = (
 				08BEC68DFF6F7D6D4920AC9A /* ActivityExecutionService.swift */,
+				23A3329A578DF34496CA5167 /* CalendarIntegrationService.swift */,
+				EDD6254743F87BFCB2C14740 /* CalendarSyncService.swift */,
 				885D69BC4279C01B1AE0BA32 /* DataMaintenanceService.swift */,
 				124756EB90D556CC3B59287C /* ExecutionRecoveryService.swift */,
 				2C122C0058ACF88A005741E0 /* LocalNotificationScheduler.swift */,
@@ -255,6 +270,15 @@
 			path = Data;
 			sourceTree = "<group>";
 		};
+		52B150859E78D902C481769F /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				698DD2C942386DF452A8AD28 /* CalendarIntegrationViewModel.swift */,
+				E6D601DF698A1A7C62F30E40 /* CalendarSettingsView.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
 		6BC04D0FB437131C9F6E7B5D /* Welcome */ = {
 			isa = PBXGroup;
 			children = (
@@ -297,6 +321,7 @@
 		7D0A696A8C3ADBDE0312A1CE /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				9B1D2805B598068302E4E154 /* ActivitySourceType.swift */,
 				19463EF83AD37872990C05E8 /* ActivityStatus.swift */,
 				003DB62D0FEB83278B5FEAFE /* ActivityTiming.swift */,
 				05C1E3EBDD7D034F341A0A96 /* DayStateResolver.swift */,
@@ -373,6 +398,7 @@
 			isa = PBXGroup;
 			children = (
 				970F5CF028B53A69EF8B86C8 /* ActivityExecutionServiceTests.swift */,
+				B8E42F308F27FDB8181C257E /* CalendarSyncServiceTests.swift */,
 				B4F856D9C5ED6EA3B69D6867 /* DayStateResolverTests.swift */,
 				67A79819B2EE89CF9CF9A81D /* DurationEstimatorTests.swift */,
 				DB41439BB0C41F3FC8231E30 /* EntryFlowViewModelTests.swift */,
@@ -527,6 +553,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				21E4509F62D12559C5DBACA2 /* ActivityExecutionServiceTests.swift in Sources */,
+				E4925EDFFE6EB07E39545372 /* CalendarSyncServiceTests.swift in Sources */,
 				697CB8B8297498F591ED1FC8 /* DayStateResolverTests.swift in Sources */,
 				6D3EA4DF70EC57792C44A022 /* DurationEstimatorTests.swift in Sources */,
 				5B13DF20612E819C08F772E7 /* EntryFlowViewModelTests.swift in Sources */,
@@ -553,11 +580,16 @@
 				BE0C30D0B92B8704E7B1FFAD /* ActivityEditorView.swift in Sources */,
 				DB449BDACF7887A223104AD6 /* ActivityExecutionService.swift in Sources */,
 				B2FD6FA7D19D355C75CAA0BC /* ActivitySession.swift in Sources */,
+				F2FD98DDD08E0EE96D6559C7 /* ActivitySourceType.swift in Sources */,
 				C6F398C54E0A248F708A45D5 /* ActivityStatus.swift in Sources */,
 				B7A7E31195E153D3AA5B5B1A /* ActivityTiming.swift in Sources */,
 				A419EEF0CA4CCF474045D655 /* AppFlowState.swift in Sources */,
 				836872326E35CAB93DD2B35C /* AppState.swift in Sources */,
 				799738F42686803F33403D75 /* AppTheme.swift in Sources */,
+				AD7352B65062E6FC17EAE95A /* CalendarIntegrationService.swift in Sources */,
+				A224B290221DD37264C675B2 /* CalendarIntegrationViewModel.swift in Sources */,
+				F1481DD34DACE065AB40201D /* CalendarSettingsView.swift in Sources */,
+				B36DC8FCDDC15D9047A23D2F /* CalendarSyncService.swift in Sources */,
 				E5BE85D2BD01297F44EC3604 /* DataMaintenanceService.swift in Sources */,
 				61664CC504377F674999CA0A /* DayStateResolver.swift in Sources */,
 				14A252061A80C9A92F4C6933 /* DurationEstimator.swift in Sources */,
@@ -697,6 +729,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Initium;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Initium lit ton calendrier pour afficher tes événements et préparer tes transitions.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Initium lit ton calendrier pour t’aider à te préparer à temps.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -812,6 +846,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Initium;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Initium lit ton calendrier pour afficher tes événements et préparer tes transitions.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Initium lit ton calendrier pour t’aider à te préparer à temps.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -129,6 +129,10 @@ struct ScheduleReplanner {
                     )
                 )
 
+                if activity.externalIsAllDay {
+                    continue
+                }
+
                 let block = fixedBlock(for: activity, replanFrom: replanFrom)
                 cursor = max(cursor, block.end.addingTimeInterval(TimeInterval(interActivityMarginSeconds)))
                 continue

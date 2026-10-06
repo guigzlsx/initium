@@ -52,9 +52,9 @@ struct LocalNotificationScheduler {
         now: Date = .now
     ) async throws {
         let descriptor = Self.descriptor(for: activity, plan: plan)
-        guard descriptor.fireDate > now else { return }
-
         center.removePendingNotificationRequests(withIdentifiers: [descriptor.identifier])
+
+        guard descriptor.fireDate > now else { return }
 
         let content = UNMutableNotificationContent()
         content.title = descriptor.title

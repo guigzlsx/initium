@@ -694,10 +694,16 @@ private struct ActivityTimelineRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(activity.scheduledStartAt, format: .dateTime.hour().minute())
-                .font(.body.weight(.semibold).monospacedDigit())
+            Group {
+                if activity.externalIsAllDay {
+                    Text(LocalizedStringKey("calendar.all_day"))
+                } else {
+                    Text(activity.scheduledStartAt, format: .dateTime.hour().minute())
+                }
+            }
+                .font(activity.externalIsAllDay ? .caption.weight(.semibold) : .body.weight(.semibold).monospacedDigit())
                 .foregroundStyle(isCurrent ? AppTheme.accent : AppTheme.secondaryText)
-                .frame(width: 54, alignment: .leading)
+                .frame(width: activity.externalIsAllDay ? 72 : 54, alignment: .leading)
 
             Capsule()
                 .fill(isCurrent ? AppTheme.accent : AppTheme.border)
@@ -714,6 +720,12 @@ private struct ActivityTimelineRow: View {
                         .font(.body.weight(isCurrent ? .semibold : .medium))
                         .foregroundStyle(activity.status == .completed ? AppTheme.secondaryText : AppTheme.primaryText)
                         .strikethrough(activity.status == .completed)
+                }
+
+                if activity.isCalendarActivity {
+                    Label(LocalizedStringKey("calendar.source_badge"), systemImage: "calendar")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(AppTheme.mutedText)
                 }
 
                 Text(statusText)

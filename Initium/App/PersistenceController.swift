@@ -3,7 +3,7 @@ import SwiftData
 
 @MainActor
 enum PersistenceController {
-    static let schema = InitiumSchemaV1.schema
+    static let schema = InitiumSchemaV2.schema
 
     static func makeContainer(inMemory: Bool = false) throws -> ModelContainer {
         let configuration = ModelConfiguration(
@@ -47,8 +47,27 @@ enum InitiumSchemaV1: VersionedSchema {
 
 enum InitiumMigrationPlan: SchemaMigrationPlan {
     static var schemas: [any VersionedSchema.Type] {
-        [InitiumSchemaV1.self]
+        // V2 adds only optional/defaulted fields. Including the same generated
+        // model types twice in a migration plan produces duplicate checksums
+        // in SwiftData, so the store uses its built-in lightweight migration.
+        [InitiumSchemaV2.self]
     }
 
     static var stages: [MigrationStage] { [] }
+}
+
+enum InitiumSchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+    static var models: [any PersistentModel.Type] {
+        [
+            Activity.self,
+            ActivitySession.self,
+            Routine.self,
+            RoutineStep.self,
+            RoutineSession.self
+        ]
+    }
+
+    static let schema = Schema(models)
 }

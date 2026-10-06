@@ -54,86 +54,154 @@ struct ActivityEditorView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
+                    if let activity, activity.isCalendarActivity {
+                        calendarEventSummary(activity)
+                    }
+
                     VStack(alignment: .leading, spacing: 12) {
                         InitiumSectionHeader(eyebrow: "ACTIVITÉ")
-                        TextField("Titre", text: $title)
-                            .font(AppTheme.Typography.cardTitle)
-                            .textFieldStyle(.plain)
-                            .focused($focusedField, equals: .title)
-                            .submitLabel(.done)
-                            .padding(16)
-                            .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
+                        if isCalendarEvent {
+                            Text(title)
+                                .font(AppTheme.Typography.cardTitle)
+                                .foregroundStyle(AppTheme.primaryText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
+                        } else {
+                            TextField("Titre", text: $title)
+                                .font(AppTheme.Typography.cardTitle)
+                                .textFieldStyle(.plain)
+                                .focused($focusedField, equals: .title)
+                                .submitLabel(.done)
+                                .padding(16)
+                                .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
+                        }
                     }
                     .initiumCard()
 
                     VStack(alignment: .leading, spacing: 12) {
                         InitiumSectionHeader(eyebrow: "QUAND")
-                        DatePicker(
-                            "Heure de début",
-                            selection: $startTime,
-                            displayedComponents: .hourAndMinute
-                        )
-                        .tint(AppTheme.accent)
+                        if isCalendarEvent {
+                            HStack {
+                                Text(LocalizedStringKey("calendar.external_time"))
+                                Spacer()
+                                Text(startTime, format: .dateTime.hour().minute())
+                                    .font(.title3.weight(.bold).monospacedDigit())
+                            }
+                            Text(LocalizedStringKey("calendar.external_read_only"))
+                                .font(.caption)
+                                .foregroundStyle(AppTheme.mutedText)
+                        } else {
+                            DatePicker(
+                                "Heure de début",
+                                selection: $startTime,
+                                displayedComponents: .hourAndMinute
+                            )
+                            .tint(AppTheme.accent)
+                        }
                     }
                     .initiumCard()
 
                     VStack(alignment: .leading, spacing: 12) {
                         InitiumSectionHeader(eyebrow: "DURÉE ESTIMÉE")
-                        durationChoices
+                        if isCalendarEvent {
+                            if activity?.externalIsAllDay == true {
+                                HStack {
+                                    Text(LocalizedStringKey("calendar.all_day"))
+                                        .font(AppTheme.Typography.cardTitle)
+                                    Spacer()
+                                    Text(LocalizedStringKey("calendar.external_read_only"))
+                                        .font(.caption)
+                                        .foregroundStyle(AppTheme.secondaryText)
+                                        .multilineTextAlignment(.trailing)
+                                }
+                            } else {
+                                HStack {
+                                    Text(ActivityTiming.durationText(seconds: max(60, activity?.estimatedDurationSeconds ?? 60)))
+                                        .font(AppTheme.Typography.metricLarge)
+                                        .monospacedDigit()
+                                    Spacer()
+                                    Text(LocalizedStringKey("calendar.external_duration"))
+                                        .font(.caption)
+                                        .foregroundStyle(AppTheme.secondaryText)
+                                }
+                            }
+                        } else {
+                            durationChoices
 
-                        if usesCustomDuration {
-                            HStack {
-                                TextField("Minutes", text: $customDurationText)
-                                    .keyboardType(.numberPad)
-                                    .textFieldStyle(.plain)
-                                    .focused($focusedField, equals: .customDuration)
+                            if usesCustomDuration {
+                                HStack {
+                                    TextField("Minutes", text: $customDurationText)
+                                        .keyboardType(.numberPad)
+                                        .textFieldStyle(.plain)
+                                        .focused($focusedField, equals: .customDuration)
 
-                                Text("minutes")
+                                    Text("minutes")
+                                        .foregroundStyle(AppTheme.secondaryText)
+                                }
+                                .padding(16)
+                                .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
+                            }
+                        }
+                    }
+                    .initiumCard()
+
+                    if !isCalendarEvent {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Toggle("Horaire fixe", isOn: $isFixedTime)
+
+                            if isFixedTime {
+                                Text("Initium évitera de déplacer cette activité lors d'une future réorganisation.")
+                                    .font(.footnote)
                                     .foregroundStyle(AppTheme.secondaryText)
                             }
-                            .padding(16)
-                            .background(AppTheme.surfaceElevated, in: RoundedRectangle(cornerRadius: InitiumRadius.medium))
                         }
+                        .initiumCard()
                     }
-                    .initiumCard()
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Toggle("Horaire fixe", isOn: $isFixedTime)
-
-                        if isFixedTime {
-                            Text("Initium évitera de déplacer cette activité lors d'une future réorganisation.")
-                                .font(.footnote)
-                                .foregroundStyle(AppTheme.secondaryText)
-                        }
-                    }
-                    .initiumCard()
 
                     VStack(alignment: .leading, spacing: 12) {
                         InitiumSectionHeader(eyebrow: "ROUTINE")
-                        Picker("Routine associée", selection: $selectedRoutineID) {
-                            Text("Aucune").tag(nil as UUID?)
+                        if activity?.externalIsAllDay == true {
+                            Text(LocalizedStringKey("calendar.all_day_no_preparation"))
+                                .font(.subheadline)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        } else {
+                            Picker("Routine associée", selection: $selectedRoutineID) {
+                                Text("Aucune").tag(nil as UUID?)
 
-                            ForEach(routines) { routine in
-                                Text(routine.name).tag(Optional(routine.id))
+                                ForEach(routines) { routine in
+                                    Text(routine.name).tag(Optional(routine.id))
+                                }
+                            }
+                            .pickerStyle(.menu)
+
+                            if let routine = selectedRoutine {
+                                transitionPreview(for: routine)
                             }
                         }
-                        .pickerStyle(.menu)
+                    }
+                    .initiumCard()
 
-                        if let routine = selectedRoutine {
-                            transitionPreview(for: routine)
+                    if !isCalendarEvent {
+                        VStack(alignment: .leading, spacing: 12) {
+                            InitiumSectionHeader(eyebrow: "NOTES")
+                            TextEditor(text: $notes)
+                                .scrollContentBackground(.hidden)
+                                .frame(minHeight: 90)
                         }
+                        .initiumCard()
+                    } else if let externalNotes = activity?.externalNotes,
+                              !externalNotes.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            InitiumSectionHeader(eyebrow: "CALENDAR NOTES")
+                            Text(externalNotes)
+                                .font(.subheadline)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+                        .initiumCard()
                     }
-                    .initiumCard()
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        InitiumSectionHeader(eyebrow: "NOTES")
-                        TextEditor(text: $notes)
-                            .scrollContentBackground(.hidden)
-                            .frame(minHeight: 90)
-                    }
-                    .initiumCard()
-
-                    if activity != nil {
+                    if activity != nil, !isCalendarEvent {
                         Menu {
                             Button("Reporter") {
                                 updateStatus(.postponed)
@@ -158,7 +226,7 @@ struct ActivityEditorView: View {
             }
             .scrollIndicators(.hidden)
             .initiumScreen()
-            .navigationTitle(activity == nil ? "Nouvelle activité" : "Modifier")
+            .navigationTitle(isCalendarEvent ? InitiumLocalization.string("calendar.event_label") : (activity == nil ? "Nouvelle activité" : "Modifier"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -171,7 +239,7 @@ struct ActivityEditorView: View {
                     Button(activity == nil ? "Ajouter" : "Enregistrer") {
                         save()
                     }
-                    .disabled(trimmedTitle.isEmpty || resolvedDurationMinutes <= 0)
+                    .disabled(saveButtonDisabled)
                 }
 
                 ToolbarItemGroup(placement: .keyboard) {
@@ -284,6 +352,34 @@ struct ActivityEditorView: View {
         routines.first { $0.id == selectedRoutineID }
     }
 
+    private var isCalendarEvent: Bool {
+        activity?.isCalendarActivity == true
+    }
+
+    private var saveButtonDisabled: Bool {
+        if isCalendarEvent { return false }
+        return trimmedTitle.isEmpty || resolvedDurationMinutes <= 0
+    }
+
+    private func calendarEventSummary(_ activity: Activity) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(LocalizedStringKey("calendar.event_label"), systemImage: "calendar")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(AppTheme.accent)
+
+            Text(LocalizedStringKey("calendar.event_read_only"))
+                .font(.caption)
+                .foregroundStyle(AppTheme.secondaryText)
+
+            if let location = activity.externalLocation, !location.isEmpty {
+                Label(location, systemImage: "mappin.and.ellipse")
+                    .font(.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+        .initiumCard(padding: 18)
+    }
+
     private func transitionPreview(for routine: Routine) -> some View {
         let calibration = routineCalibration.result(for: routine)
 
@@ -371,11 +467,13 @@ struct ActivityEditorView: View {
         let savedActivity: Activity
 
         if let activity {
-            activity.title = trimmedTitle
-            activity.scheduledStartAt = startTime
-            activity.estimatedDurationSeconds = durationSeconds
-            activity.isFixedTime = isFixedTime
-            activity.notes = notes
+            if !isCalendarEvent {
+                activity.title = trimmedTitle
+                activity.scheduledStartAt = startTime
+                activity.estimatedDurationSeconds = durationSeconds
+                activity.isFixedTime = isFixedTime
+                activity.notes = notes
+            }
             activity.routine = routine
             activity.transitionMarginSeconds = transitionMarginMinutes * 60
             savedActivity = activity
