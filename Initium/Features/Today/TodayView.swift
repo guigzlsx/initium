@@ -3,6 +3,7 @@ import SwiftData
 
 struct TodayView: View {
     @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var templateCatalog: RoutineTemplateCatalogViewModel
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: \Activity.scheduledStartAt)
@@ -18,6 +19,7 @@ struct TodayView: View {
     @State private var showingReplan = false
     @State private var showingSettings = false
     @State private var replanFrom = Date.now
+    @State private var applyingTemplateActivityID: UUID?
 
     private let resolver = DayStateResolver()
     private let calendar = Calendar.current
@@ -25,13 +27,79 @@ struct TodayView: View {
     private let routineCalibration = RoutineCalibration()
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 30)) { context in
-            navigationContent(now: context.date)
+        NavigationStack {
+            TimelineView(.periodic(from: .now, by: 30)) { context in
+                navigationContent(now: context.date)
+                    #if DEBUG
+                    .onAppear {
+                        if appState.launchEditorDemo,
+                           let demoActivity = dayActivities.first(where: { $0.title == "Restaurant" }) {
+                            editingActivity = demoActivity
+                            showingActivityEditor = true
+                            appState.launchEditorDemo = false
+                        } else if appState.launchReplanDemo {
+                            openReplan(at: context.date)
+                            appState.launchReplanDemo = false
+                        }
+                    }
+                    #endif
+                    .sheet(isPresented: $showingActivityEditor, onDismiss: {
+                        editingActivity = nil
+                    }) {
+                        ActivityEditorView(activity: editingActivity, day: selectedDate)
+                    }
+                    .sheet(isPresented: $showingReplan) {
+                        ReplanView(
+                            activities: dayActivities,
+                            replanFrom: replanFrom
+                        )
+                    }
+                    .sheet(isPresented: $showingSettings) {
+                        SettingsView()
+                    }
+                    .alert("Impossible de démarrer", isPresented: errorBinding) {
+                        Button("OK", role: .cancel) { }
+                    } message: {
+                        Text(errorMessage ?? "Une erreur est survenue.")
+                    }
+                    .confirmationDialog(
+                        "La préparation peut commencer.",
+                        isPresented: $showingTransitionConflict,
+                        titleVisibility: .visible
+                    ) {
+                        Button("Mettre en pause et commencer") {
+                            pauseCurrentActivityAndStartTransition(at: context.date)
+                        }
+
+                        Button("+5 min puis continuer") {
+                            extendCurrentActivity(by: 300, at: context.date)
+                        }
+
+                        Button("+10 min puis continuer") {
+                            extendCurrentActivity(by: 600, at: context.date)
+                        }
+
+                        Button("Annuler", role: .cancel) { }
+                    } message: {
+                        if let current = transitionConflictActivity,
+                           let pending = pendingTransitionActivity {
+                            Text(InitiumLocalization.string("today.transition.conflict.message", current.title, pending.title))
+                        }
+                    }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar(.hidden, for: .navigationBar)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func navigationContent(now: Date) -> some View {
-        NavigationStack {
+        ZStack {
+            AppTheme.background
+                .ignoresSafeArea()
+
             ScrollView {
                 VStack(alignment: .leading, spacing: InitiumSpacing.lg) {
                     topControls
@@ -50,69 +118,8 @@ struct TodayView: View {
                 }
                 .padding(.horizontal, AppTheme.screenHorizontalPadding)
                 .padding(.top, InitiumSpacing.sm)
-                .padding(.bottom, 112)
             }
             .scrollIndicators(.hidden)
-            .initiumScreen()
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            #if DEBUG
-            .onAppear {
-                if appState.launchEditorDemo,
-                   let demoActivity = dayActivities.first(where: { $0.title == "Restaurant" }) {
-                    editingActivity = demoActivity
-                    showingActivityEditor = true
-                    appState.launchEditorDemo = false
-                } else if appState.launchReplanDemo {
-                    openReplan(at: now)
-                    appState.launchReplanDemo = false
-                }
-            }
-            #endif
-            .toolbar(.hidden, for: .navigationBar)
-            .sheet(isPresented: $showingActivityEditor, onDismiss: {
-                editingActivity = nil
-            }) {
-                ActivityEditorView(activity: editingActivity, day: selectedDate)
-            }
-            .sheet(isPresented: $showingReplan) {
-                ReplanView(
-                    activities: dayActivities,
-                    replanFrom: replanFrom
-                )
-            }
-            .sheet(isPresented: $showingSettings) {
-                SettingsView()
-            }
-            .alert("Impossible de démarrer", isPresented: errorBinding) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(errorMessage ?? "Une erreur est survenue.")
-            }
-            .confirmationDialog(
-                "La préparation peut commencer.",
-                isPresented: $showingTransitionConflict,
-                titleVisibility: .visible
-            ) {
-                Button("Mettre en pause et commencer") {
-                    pauseCurrentActivityAndStartTransition(at: now)
-                }
-
-                Button("+5 min puis continuer") {
-                    extendCurrentActivity(by: 300, at: now)
-                }
-
-                Button("+10 min puis continuer") {
-                    extendCurrentActivity(by: 600, at: now)
-                }
-
-                Button("Annuler", role: .cancel) { }
-            } message: {
-                if let current = transitionConflictActivity,
-                   let pending = pendingTransitionActivity {
-                    Text(InitiumLocalization.string("today.transition.conflict.message", current.title, pending.title))
-                }
-            }
         }
     }
 
@@ -446,16 +453,28 @@ struct TodayView: View {
                 emptyState
             } else {
                 ForEach(dayActivities) { activity in
-                    Button {
-                        edit(activity)
-                    } label: {
-                        ActivityTimelineRow(
-                            activity: activity,
-                            isCurrent: activity.id == currentActivity(at: now)?.id
-                        )
+                    VStack(alignment: .leading, spacing: 10) {
+                        Button {
+                            edit(activity)
+                        } label: {
+                            ActivityTimelineRow(
+                                activity: activity,
+                                isCurrent: activity.id == currentActivity(at: now)?.id
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .frame(minHeight: 44)
+
+                        if let match = templateSuggestion(for: activity) {
+                            RoutineTemplateSuggestionCard(
+                                match: match,
+                                catalog: templateCatalog.catalog,
+                                isApplying: applyingTemplateActivityID == activity.id
+                            ) {
+                                applyTemplate(match, to: activity)
+                            }
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .frame(minHeight: 44)
                 }
             }
         }
@@ -495,6 +514,31 @@ struct TodayView: View {
         guard let routine = activity.routine else { return nil }
         let result = routineCalibration.result(for: routine)
         return result.hasEnoughHistory ? result : nil
+    }
+
+    private func templateSuggestion(for activity: Activity) -> RoutineTemplateMatch? {
+        guard !isTerminal(activity.status) else { return nil }
+        return templateCatalog.match(for: activity)
+    }
+
+    private func applyTemplate(_ match: RoutineTemplateMatch, to activity: Activity) {
+        applyingTemplateActivityID = activity.id
+
+        Task { @MainActor in
+            defer { applyingTemplateActivityID = nil }
+
+            do {
+                _ = try await RoutineTemplateApplicationService().apply(
+                    template: match.template,
+                    catalog: templateCatalog.catalog,
+                    to: activity,
+                    in: modelContext
+                )
+                InitiumHaptics.success()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
     }
 
     private func currentActivity(at now: Date) -> Activity? {
@@ -779,5 +823,6 @@ private struct ActivityTimelineRow: View {
 #Preview("Today") {
     TodayView()
         .environmentObject(AppState())
+        .environmentObject(RoutineTemplateCatalogViewModel())
         .modelContainer(PersistenceController.preview)
 }

@@ -28,13 +28,17 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.guillaumelsx.initium
         PRODUCT_NAME: Initium
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Initium/Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Initium
         INFOPLIST_KEY_UILaunchScreen_Generation: true
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: true
         INFOPLIST_KEY_NSCalendarsUsageDescription: "Initium lit ton calendrier pour t’aider à te préparer à temps."
         INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription: "Initium lit ton calendrier pour afficher tes événements et préparer tes transitions."
+        # Optional public client configuration. Leave undefined to run fully offline.
+        INFOPLIST_KEY_SUPABASE_URL: "$(SUPABASE_URL)"
+        INFOPLIST_KEY_SUPABASE_ANON_KEY: "$(SUPABASE_ANON_KEY)"
         SWIFT_EMIT_LOC_STRINGS: true
     scheme:
       testTargets:

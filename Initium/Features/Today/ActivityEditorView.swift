@@ -4,6 +4,7 @@ import SwiftData
 struct ActivityEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var templateCatalog: RoutineTemplateCatalogViewModel
 
     @Query(sort: \Routine.name)
     private var routines: [Routine]
@@ -78,6 +79,16 @@ struct ActivityEditorView: View {
                         }
                     }
                     .initiumCard()
+
+                    if let suggestion = suggestedTemplate {
+                        RoutineTemplateSuggestionCard(
+                            match: suggestion,
+                            catalog: templateCatalog.catalog,
+                            isApplying: false
+                        ) {
+                            useSuggestedTemplate(suggestion)
+                        }
+                    }
 
                     VStack(alignment: .leading, spacing: 12) {
                         InitiumSectionHeader(eyebrow: "QUAND")
@@ -352,6 +363,21 @@ struct ActivityEditorView: View {
         routines.first { $0.id == selectedRoutineID }
     }
 
+    private var suggestedTemplate: RoutineTemplateMatch? {
+        guard selectedRoutine == nil else { return nil }
+        let draftActivity = Activity(
+            title: trimmedTitle,
+            scheduledStartAt: startTime,
+            estimatedDurationSeconds: max(60, resolvedDurationMinutes * 60),
+            isFixedTime: isFixedTime,
+            sourceType: activity?.sourceType ?? .local
+        )
+        draftActivity.externalLocation = activity?.externalLocation
+        draftActivity.externalIsAllDay = activity?.externalIsAllDay ?? false
+        draftActivity.isExternallyDeleted = activity?.isExternallyDeleted ?? false
+        return templateCatalog.match(for: draftActivity)
+    }
+
     private var isCalendarEvent: Bool {
         activity?.isCalendarActivity == true
     }
@@ -459,6 +485,27 @@ struct ActivityEditorView: View {
         durationMinutes = minutes
         customDurationText = String(minutes)
         usesCustomDuration = true
+    }
+
+    private func useSuggestedTemplate(_ match: RoutineTemplateMatch) {
+        do {
+            let (routine, _) = try RoutineTemplateApplicationService().makeOrReuseRoutine(
+                from: match.template,
+                catalog: templateCatalog.catalog,
+                in: modelContext
+            )
+            selectedRoutineID = routine.id
+            transitionMarginMinutes = max(0, match.template.defaultMarginSeconds / 60)
+
+            if let activity {
+                activity.routine = routine
+                activity.transitionMarginSeconds = match.template.defaultMarginSeconds
+                try modelContext.save()
+                scheduleNotificationIfAuthorized(for: activity)
+            }
+        } catch {
+            saveErrorMessage = error.localizedDescription
+        }
     }
 
     private func save() {
@@ -599,5 +646,6 @@ struct ActivityEditorView: View {
 
 #Preview("Activity editor") {
     ActivityEditorView(activity: nil, day: .now)
+        .environmentObject(RoutineTemplateCatalogViewModel())
         .modelContainer(PersistenceController.preview)
 }

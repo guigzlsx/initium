@@ -286,6 +286,9 @@
 "calendar.event_read_only" = "Le titre, l’horaire et la durée sont gérés par ton calendrier. Tu peux configurer la préparation ci-dessous.";
 "calendar.all_day" = "Toute la journée";
 "calendar.source_badge" = "Calendrier";
+"routine_template.suggestion_eyebrow" = "PRÉPARATION SUGGÉRÉE";
+"routine_template.summary" = "%d étapes · %@";
+"routine_template.use" = "Utiliser";
 "calendar.all_day_no_preparation" = "Les événements toute la journée restent visibles, sans timer ni préparation automatique.";
 "insights.overall_learning_accessibility" = "Ton temps. Initium apprend encore ton rythme.";
 "insights.overall_accessibility" = "Ton temps. Prévu en moyenne %@. Réel %@. Basé sur %d activités.";

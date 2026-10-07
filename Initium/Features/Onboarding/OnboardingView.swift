@@ -63,6 +63,7 @@ struct OnboardingView: View {
             .opacity(viewModel.isCurrentQuestionAnswered ? 1 : 0.45)
             .padding(.bottom, 12)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, AppTheme.screenHorizontalPadding)
         .initiumScreen()
     }

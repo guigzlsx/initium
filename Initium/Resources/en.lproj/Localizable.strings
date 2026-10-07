@@ -284,6 +284,9 @@
 "calendar.event_read_only" = "The title, time and duration are managed by your calendar. You can configure preparation below.";
 "calendar.all_day" = "All day";
 "calendar.source_badge" = "Calendar";
+"routine_template.suggestion_eyebrow" = "SUGGESTED PREPARATION";
+"routine_template.summary" = "%d steps · %@";
+"routine_template.use" = "Use it";
 "calendar.all_day_no_preparation" = "All-day events stay visible without a timer or automatic preparation.";
 "insights.overall_learning_accessibility" = "Your time. Initium is still learning your rhythm.";
 "insights.overall_accessibility" = "Your time. Average planned %@. Actual %@. Based on %d activities.";

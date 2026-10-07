@@ -68,6 +68,7 @@ struct ValueSummaryView: View {
             .frame(maxWidth: 560)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .scrollIndicators(.hidden)
         .initiumScreen()
     }

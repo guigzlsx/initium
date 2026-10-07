@@ -9,6 +9,7 @@ struct InitiumApp: App {
 
     @StateObject private var appState = AppState()
     @StateObject private var entryFlow = EntryFlowViewModel()
+    @StateObject private var templateCatalog = RoutineTemplateCatalogViewModel()
     @AppStorage("initium.appearance") private var appearance = InitiumAppearance.system.rawValue
 
     init() {
@@ -40,6 +41,7 @@ struct InitiumApp: App {
             InitiumRootView()
                 .environmentObject(appState)
                 .environmentObject(entryFlow)
+                .environmentObject(templateCatalog)
                 .modelContainer(modelContainer)
                 .tint(AppTheme.accent)
                 .preferredColorScheme(InitiumAppearance(rawValue: appearance)?.colorScheme)
@@ -49,21 +51,32 @@ struct InitiumApp: App {
 
 private struct InitiumRootView: View {
     @EnvironmentObject private var entryFlow: EntryFlowViewModel
+    @EnvironmentObject private var templateCatalog: RoutineTemplateCatalogViewModel
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @StateObject private var calendarSyncCoordinator = CalendarSyncCoordinator()
 
     var body: some View {
-        Group {
-            if entryFlow.state == .mainApp {
-                RootTabView()
-            } else {
-                EntryFlowView(viewModel: entryFlow)
+        ZStack {
+            AppTheme.background
+                .ignoresSafeArea()
+
+            Group {
+                if entryFlow.state == .mainApp {
+                    RootTabView()
+                } else {
+                    EntryFlowView(viewModel: entryFlow)
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: entryFlow.state)
         .task {
+            Task {
+                await templateCatalog.loadAndRefresh()
+            }
             await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
         }
         .onChange(of: scenePhase) { _, newPhase in
@@ -113,5 +126,18 @@ private struct RootTabView: View {
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarColorScheme(.dark, for: .tabBar)
         .tint(AppTheme.primaryText)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .modifier(StableTabBarModifier())
+    }
+}
+
+private struct StableTabBarModifier: ViewModifier {
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content.tabBarMinimizeBehavior(.never)
+        } else {
+            content
+        }
     }
 }

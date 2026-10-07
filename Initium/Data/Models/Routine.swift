@@ -6,6 +6,8 @@ final class Routine {
     var id: UUID = UUID()
     var name: String = ""
     var icon: String = "checklist"
+    /// Stable local provenance only. A template refresh never mutates this routine.
+    var sourceTemplateSlug: String?
     var createdAt: Date = Date.now
     var updatedAt: Date = Date.now
 
@@ -28,8 +30,9 @@ final class Routine {
         steps.sorted { $0.order < $1.order }
     }
 
-    init(name: String, icon: String = "checklist") {
+    init(name: String, icon: String = "checklist", sourceTemplateSlug: String? = nil) {
         self.name = name
         self.icon = icon
+        self.sourceTemplateSlug = sourceTemplateSlug
     }
 }
