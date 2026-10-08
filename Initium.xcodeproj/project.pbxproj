@@ -130,6 +130,7 @@
 		37DDBDB438CDC2C6164EF94A /* RoutineTemplateMatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplateMatcherTests.swift; sourceTree = "<group>"; };
 		3AD0DCC37C9B01D099F34A98 /* InsightsCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsCalculator.swift; sourceTree = "<group>"; };
 		3EBB55B053E30D75B7D8490C /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		4197ECFDEF0C9DC5B43BAAD6 /* Initium.local.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Initium.local.xcconfig; sourceTree = "<group>"; };
 		48023332378723BF284CC498 /* PaywallPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPlaceholderView.swift; sourceTree = "<group>"; };
 		4EF6A79D396169FC19DB14A2 /* ActivityEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityEditorView.swift; sourceTree = "<group>"; };
 		4F2A66B2CB629D629D496EB8 /* ScheduleReplanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleReplanner.swift; sourceTree = "<group>"; };
@@ -394,6 +395,14 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		96DA5EF280ED12A94DE13D72 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				4197ECFDEF0C9DC5B43BAAD6 /* Initium.local.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		A39B25C7218B8F7ACE56BB9F /* Formatters */ = {
 			isa = PBXGroup;
 			children = (
@@ -482,6 +491,7 @@
 		EFD58F40D2E8321F62D5DAA5 = {
 			isa = PBXGroup;
 			children = (
+				96DA5EF280ED12A94DE13D72 /* Config */,
 				DF5342AE43B2C60154AB3511 /* Initium */,
 				CB43610CED2F31B734FB85AE /* InitiumTests */,
 				760A072977D284209092CD48 /* Products */,
@@ -707,6 +717,7 @@
 /* Begin XCBuildConfiguration section */
 		6303DC036D20AAF41AEC2C02 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4197ECFDEF0C9DC5B43BAAD6 /* Initium.local.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -765,6 +776,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SUPABASE_URL = "https://ffgqokjkxqloepyevbct.supabase.co";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -817,6 +829,7 @@
 		};
 		E06DBE8ACF067231790DA40E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4197ECFDEF0C9DC5B43BAAD6 /* Initium.local.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -868,6 +881,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SUPABASE_URL = "https://ffgqokjkxqloepyevbct.supabase.co";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;

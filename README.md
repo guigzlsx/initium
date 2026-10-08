@@ -132,7 +132,9 @@ SUPABASE_ANON_KEY=<clé client publique>
 
 `SUPABASE_ANON_KEY` est le nom de configuration conservé par le projet. Il peut recevoir la clé publishable/client publique Supabase utilisée par l’environnement courant.
 
-Ne jamais committer de clé réelle et ne jamais utiliser de `service_role` key dans l’application. Les variables doivent être fournies par une configuration de build locale ou par les secrets de CI.
+Pour un environnement local, copier `Config/Initium.local.xcconfig.example` vers `Config/Initium.local.xcconfig`, puis remplacer `REPLACE_WITH_SUPABASE_PUBLISHABLE_KEY` par la clé client publique du projet. Le fichier `Config/Initium.local.xcconfig` est ignoré par Git et doit rester local.
+
+Ne jamais committer de clé réelle et ne jamais utiliser de `service_role` key dans l’application. Les variables peuvent être fournies par cette configuration de build locale ou par les secrets de CI.
 
 ### Schéma distant
 
@@ -172,7 +174,7 @@ Dans Xcode :
 1. sélectionner le scheme `Initium` ;
 2. sélectionner la target `Initium` ;
 3. choisir un Simulator ou un appareil iOS ;
-4. fournir `SUPABASE_URL` et `SUPABASE_ANON_KEY` dans la configuration de build si les services Supabase sont utilisés ;
+4. créer `Config/Initium.local.xcconfig` depuis l’exemple et renseigner `SUPABASE_ANON_KEY` si les services Supabase sont utilisés ;
 5. lancer l’application.
 
 La target principale est `Initium`, la target de tests est `InitiumTests`. Les configurations disponibles sont `Debug` et `Release`.

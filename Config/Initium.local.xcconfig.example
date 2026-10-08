@@ -1,0 +1,5 @@
+// Copy this file to Config/Initium.local.xcconfig and replace the placeholder.
+// This file is intentionally safe to commit; the copied local file is ignored.
+
+SUPABASE_URL = https://ffgqokjkxqloepyevbct.supabase.co
+SUPABASE_ANON_KEY = REPLACE_WITH_SUPABASE_PUBLISHABLE_KEY
