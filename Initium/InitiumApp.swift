@@ -8,7 +8,8 @@ struct InitiumApp: App {
     private let modelContainer: ModelContainer
 
     @StateObject private var appState = AppState()
-    @StateObject private var entryFlow = EntryFlowViewModel()
+    @StateObject private var authentication: AuthenticationService
+    @StateObject private var entryFlow: EntryFlowViewModel
     @StateObject private var templateCatalog = RoutineTemplateCatalogViewModel()
     @AppStorage("initium.appearance") private var appearance = InitiumAppearance.system.rawValue
 
@@ -34,12 +35,17 @@ struct InitiumApp: App {
         } catch {
             fatalError("Unable to create the Initium model container: \(error)")
         }
+
+        let authentication = AuthenticationService()
+        _authentication = StateObject(wrappedValue: authentication)
+        _entryFlow = StateObject(wrappedValue: EntryFlowViewModel())
     }
 
     var body: some Scene {
         WindowGroup {
             InitiumRootView()
                 .environmentObject(appState)
+                .environmentObject(authentication)
                 .environmentObject(entryFlow)
                 .environmentObject(templateCatalog)
                 .modelContainer(modelContainer)
@@ -50,6 +56,7 @@ struct InitiumApp: App {
 }
 
 private struct InitiumRootView: View {
+    @EnvironmentObject private var authentication: AuthenticationService
     @EnvironmentObject private var entryFlow: EntryFlowViewModel
     @EnvironmentObject private var templateCatalog: RoutineTemplateCatalogViewModel
     @Environment(\.modelContext) private var modelContext
@@ -66,7 +73,19 @@ private struct InitiumRootView: View {
                 if entryFlow.state == .mainApp {
                     RootTabView()
                 } else {
-                    EntryFlowView(viewModel: entryFlow)
+                    switch authentication.state {
+                    case .restoring:
+                        ProgressView()
+                            .tint(AppTheme.accent)
+                    case .loggedOut:
+                        EntryFlowView(viewModel: entryFlow)
+                    case .loggedIn:
+                        if authentication.isPasswordRecoveryActive {
+                            PasswordRecoveryView()
+                        } else {
+                            RootTabView()
+                        }
+                    }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -74,13 +93,16 @@ private struct InitiumRootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: entryFlow.state)
         .task {
+            await authentication.restoreSession()
             Task {
                 await templateCatalog.loadAndRefresh()
             }
-            await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
+            if authentication.state == .loggedIn {
+                await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
+            }
         }
         .onChange(of: scenePhase) { _, newPhase in
-            guard newPhase == .active else { return }
+            guard newPhase == .active, authentication.state == .loggedIn else { return }
             Task {
                 await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
             }
@@ -88,6 +110,11 @@ private struct InitiumRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .EKEventStoreChanged)) { _ in
             Task {
                 await calendarSyncCoordinator.syncIfNeeded(in: modelContext)
+            }
+        }
+        .onOpenURL { url in
+            Task {
+                await authentication.handleAuthCallback(url)
             }
         }
     }

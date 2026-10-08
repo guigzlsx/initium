@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EntryFlowView: View {
     @ObservedObject var viewModel: EntryFlowViewModel
+    @EnvironmentObject private var authentication: AuthenticationService
 
     var body: some View {
         ZStack {
@@ -28,9 +29,7 @@ struct EntryFlowView: View {
                         viewModel.continueFromPaywall()
                     }
                 case .accountCreation:
-                    AccountPlaceholderView {
-                        viewModel.completeAccountPlaceholder()
-                    }
+                    AccountView(authentication: authentication)
                 case .mainApp:
                     Color.clear
                 }

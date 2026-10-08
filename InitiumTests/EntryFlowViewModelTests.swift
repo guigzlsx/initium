@@ -83,11 +83,8 @@ final class EntryFlowViewModelTests: XCTestCase {
         viewModel.continueFromPaywall()
         XCTAssertEqual(viewModel.state, .accountCreation)
 
-        viewModel.completeAccountPlaceholder()
-        XCTAssertEqual(viewModel.state, .mainApp)
-
         let relaunch = EntryFlowViewModel(defaults: defaults)
-        XCTAssertEqual(relaunch.state, .mainApp)
+        XCTAssertEqual(relaunch.state, .accountCreation)
     }
 
     func testPaywallAndAccountProgressPersistIndependently() {

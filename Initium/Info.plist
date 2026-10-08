@@ -30,6 +30,17 @@
 	<string>Initium lit ton calendrier pour afficher tes événements et préparer tes transitions.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>initium</string>
+			</array>
+		</dict>
+	</array>
 	<key>SUPABASE_URL</key>
 	<string>$(SUPABASE_URL)</string>
 	<key>SUPABASE_ANON_KEY</key>

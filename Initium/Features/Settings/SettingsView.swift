@@ -23,6 +23,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var entryFlow: EntryFlowViewModel
+    @EnvironmentObject private var authentication: AuthenticationService
     @AppStorage("initium.appearance") private var appearance = InitiumAppearance.system.rawValue
     @AppStorage("initium.calendar.enabled") private var calendarEnabled = false
 
@@ -53,6 +54,33 @@ struct SettingsView: View {
                         }
                         .pickerStyle(.menu)
                         .tint(AppTheme.primaryText)
+                    }
+
+                    settingsCard(eyebrow: "auth.profile.eyebrow") {
+                        NavigationLink {
+                            ProfileView(authentication: authentication)
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: "person.crop.circle")
+                                    .foregroundStyle(AppTheme.accent)
+
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text("auth.profile.title")
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(AppTheme.primaryText)
+
+                                    Text(authentication.currentUser?.email ?? "")
+                                        .font(.caption)
+                                        .foregroundStyle(AppTheme.secondaryText)
+                                        .lineLimit(1)
+                                }
+
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(AppTheme.mutedText)
+                            }
+                        }
                     }
 
                     settingsCard(eyebrow: "RAPPELS") {
@@ -107,7 +135,7 @@ struct SettingsView: View {
                     }
 
                     settingsCard(eyebrow: "DONNÉES ET CONFIDENTIALITÉ") {
-                        Text("Tes données restent sur cet appareil. Initium n’utilise aucun compte et n’envoie pas tes activités à un serveur.")
+                        Text("privacy.local_data_account_note")
                             .font(.footnote)
                             .foregroundStyle(AppTheme.secondaryText)
 
@@ -250,4 +278,5 @@ struct SettingsView: View {
     SettingsView()
         .modelContainer(PersistenceController.preview)
         .environmentObject(EntryFlowViewModel())
+        .environmentObject(AuthenticationService(configuration: nil))
 }

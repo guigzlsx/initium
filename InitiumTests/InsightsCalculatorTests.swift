@@ -263,7 +263,7 @@ final class InsightsCalculatorTests: XCTestCase {
         let container = try PersistenceController.makeContainer(inMemory: true)
         let activity = Activity(
             title: "Sport",
-            scheduledStartAt: now.addingTimeInterval(60 * 60),
+            scheduledStartAt: now.addingTimeInterval(-60 * 60),
             estimatedDurationSeconds: 30 * 60
         )
         activity.originalScheduledStartAt = activity.scheduledStartAt.addingTimeInterval(-15 * 60)

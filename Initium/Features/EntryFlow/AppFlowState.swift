@@ -7,5 +7,5 @@ enum AppFlowState: String, Equatable {
     case valueSummary
     case paywall
     case accountCreation
-    case mainApp
+    case mainApp // DEBUG preview mode only; normal auth routing uses AuthenticationState.
 }

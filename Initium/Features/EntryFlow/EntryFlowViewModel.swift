@@ -15,7 +15,6 @@ final class EntryFlowViewModel: ObservableObject {
         static let hasSeenWelcome = "initium.entry.hasSeenWelcome"
         static let onboardingCompleted = "initium.entry.onboardingCompleted"
         static let paywallSeen = "initium.entry.paywallSeen"
-        static let accountPlaceholderCompleted = "initium.entry.accountPlaceholderCompleted"
         static let onboardingStep = "initium.entry.onboardingStep"
         static let onboardingPreferences = "initium.entry.onboardingPreferences"
     }
@@ -99,17 +98,11 @@ final class EntryFlowViewModel: ObservableObject {
         state = .accountCreation
     }
 
-    func completeAccountPlaceholder() {
-        defaults.set(true, forKey: Key.accountPlaceholderCompleted)
-        state = .mainApp
-    }
-
     #if DEBUG
     func resetForDevelopment() {
         defaults.removeObject(forKey: Key.hasSeenWelcome)
         defaults.removeObject(forKey: Key.onboardingCompleted)
         defaults.removeObject(forKey: Key.paywallSeen)
-        defaults.removeObject(forKey: Key.accountPlaceholderCompleted)
         defaults.removeObject(forKey: Key.onboardingStep)
         defaults.removeObject(forKey: Key.onboardingPreferences)
         onboardingStep = 0
@@ -128,9 +121,7 @@ final class EntryFlowViewModel: ObservableObject {
         }
         #endif
 
-        if defaults.bool(forKey: Key.accountPlaceholderCompleted) {
-            state = .mainApp
-        } else if defaults.bool(forKey: Key.paywallSeen) {
+        if defaults.bool(forKey: Key.paywallSeen) {
             state = .accountCreation
         } else if defaults.bool(forKey: Key.onboardingCompleted) {
             state = .valueSummary
