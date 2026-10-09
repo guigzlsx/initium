@@ -1,4 +1,5 @@
 import Foundation
+import os
 import Security
 
 enum AuthenticationState: Equatable, Sendable {
@@ -88,6 +89,11 @@ protocol AuthenticationServicing: AnyObject {
 }
 
 final class KeychainAuthSessionStore: AuthSessionStoring {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.guillaumelsx.initium",
+        category: "Authentication"
+    )
+
     private let service: String
     private let account: String
 
@@ -119,7 +125,13 @@ final class KeychainAuthSessionStore: AuthSessionStoring {
     }
 
     func save(_ session: StoredAuthSession) throws {
-        let data = try JSONEncoder().encode(session)
+        let data: Data
+        do {
+            data = try JSONEncoder().encode(session)
+        } catch {
+            Self.logger.error("[AUTH] keychain encode failed error=\(String(describing: error), privacy: .public)")
+            throw AuthenticationError.unknown
+        }
         let baseQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -131,10 +143,13 @@ final class KeychainAuthSessionStore: AuthSessionStoring {
         ]
 
         let updateStatus = SecItemUpdate(baseQuery as CFDictionary, attributes as CFDictionary)
+        Self.logger.error("[AUTH] keychain update_status=\(updateStatus, privacy: .public)")
         if updateStatus == errSecItemNotFound {
             var item = baseQuery
             attributes.forEach { item[$0.key] = $0.value }
-            guard SecItemAdd(item as CFDictionary, nil) == errSecSuccess else {
+            let addStatus = SecItemAdd(item as CFDictionary, nil)
+            Self.logger.error("[AUTH] keychain add_status=\(addStatus, privacy: .public)")
+            guard addStatus == errSecSuccess else {
                 throw AuthenticationError.unknown
             }
         } else if updateStatus != errSecSuccess {
@@ -158,6 +173,10 @@ final class KeychainAuthSessionStore: AuthSessionStoring {
 @MainActor
 final class AuthenticationService: ObservableObject, AuthenticationServicing {
     static let passwordResetRedirectURL = "initium://auth/callback"
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.guillaumelsx.initium",
+        category: "Authentication"
+    )
 
     @Published private(set) var state: AuthenticationState = .restoring
     @Published private(set) var profile: UserProfile?
@@ -206,6 +225,7 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
     }
 
     func signUp(email: String, password: String, displayName: String) async throws {
+        Self.logger.info("[AUTH] signup started")
         let response: AuthResponse
         do {
             response = try await request(
@@ -221,12 +241,24 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
                 )
             )
         } catch let error as AuthenticationError {
+            Self.logger.error("[AUTH] signup failed before session error=\(String(describing: error), privacy: .public)")
             throw error
         } catch {
-            throw map(error)
+            let mappedError = map(error)
+            Self.logger.error("[AUTH] signup failed before session error=unknown, mapped=\(String(describing: mappedError), privacy: .public)")
+            throw mappedError
         }
 
-        try await establishSession(from: response)
+        do {
+            try await establishSession(from: response)
+            Self.logger.info("[AUTH] signup completed final_state=loggedIn")
+        } catch let error as AuthenticationError {
+            Self.logger.error("[AUTH] signup failed after response error=\(String(describing: error), privacy: .public)")
+            throw error
+        } catch {
+            Self.logger.error("[AUTH] signup failed after response error=unknown")
+            throw map(error)
+        }
     }
 
     func signIn(email: String, password: String) async throws {
@@ -373,11 +405,15 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
     }
 
     private func establishSession(from response: AuthResponse) async throws {
+        let userDecoded = response.user != nil
+        let sessionDecoded = response.accessToken != nil && response.refreshToken != nil
+        Self.logger.info("[AUTH] auth response user_decoded=\(userDecoded, privacy: .public) session_decoded=\(sessionDecoded, privacy: .public)")
         guard
             let accessToken = response.accessToken,
             let refreshToken = response.refreshToken,
             let user = response.user
         else {
+            Self.logger.error("[AUTH] auth session decode failed user_decoded=\(userDecoded, privacy: .public) session_decoded=\(sessionDecoded, privacy: .public)")
             throw AuthenticationError.sessionUnavailable
         }
 
@@ -387,16 +423,26 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
             expiresAt: response.expirationDate,
             user: user.authenticatedUser
         )
-        try sessionStore.save(session)
+        do {
+            try sessionStore.save(session)
+            Self.logger.info("[AUTH] session saved=yes")
+        } catch {
+            Self.logger.error("[AUTH] session saved=no error=\(String(describing: error), privacy: .public)")
+            throw error
+        }
         currentSession = session
         state = .loggedIn
+        Self.logger.info("[AUTH] authentication_state=loggedIn")
         do {
             _ = try await fetchProfile()
+            Self.logger.info("[AUTH] profile fetch=yes")
         } catch {
+            Self.logger.error("[AUTH] profile fetch=no error=\(String(describing: error), privacy: .public)")
             currentSession = nil
             profile = nil
             try? sessionStore.clear()
             state = .loggedOut
+            Self.logger.error("[AUTH] authentication_state=loggedOut reason=profile_fetch_failed")
             throw AuthenticationError.profileUnavailable
         }
     }
@@ -444,12 +490,17 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
         do {
             (data, response) = try await session.data(for: request)
         } catch {
+            Self.logger.error("[AUTH] request transport_failed path=\(Self.logPath(path), privacy: .public)")
             throw AuthenticationError.network
+        }
+        if let httpResponse = response as? HTTPURLResponse {
+            Self.logger.info("[AUTH] request method=\(method, privacy: .public) path=\(Self.logPath(path), privacy: .public) status=\(httpResponse.statusCode, privacy: .public)")
         }
         try validate(response: response, data: data)
         do {
             return try JSONDecoder.supabase.decode(T.self, from: data)
         } catch {
+            Self.logger.error("[AUTH] response decode failed path=\(Self.logPath(path), privacy: .public)")
             throw AuthenticationError.unknown
         }
     }
@@ -489,7 +540,11 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
         do {
             (data, response) = try await session.data(for: request)
         } catch {
+            Self.logger.error("[AUTH] request transport_failed path=\(Self.logPath(path), privacy: .public)")
             throw AuthenticationError.network
+        }
+        if let httpResponse = response as? HTTPURLResponse {
+            Self.logger.info("[AUTH] request method=\(method, privacy: .public) path=\(Self.logPath(path), privacy: .public) status=\(httpResponse.statusCode, privacy: .public)")
         }
         try validate(response: response, data: data)
         return data
@@ -554,7 +609,10 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
     }
 
     private func map(status: Int, data: Data) -> AuthenticationError {
-        let message = (try? JSONDecoder().decode(AuthErrorPayload.self, from: data))?.messageText?.lowercased() ?? ""
+        let payload = try? JSONDecoder().decode(AuthErrorPayload.self, from: data)
+        let message = payload?.messageText?.lowercased() ?? ""
+        let code = payload?.codeText ?? "unknown"
+        Self.logger.error("[AUTH] backend error status=\(status, privacy: .public) code=\(code, privacy: .public) message=\(payload?.messageText ?? "unknown", privacy: .public)")
         if status == 429 { return .rateLimited }
         if status == 401 || message.contains("invalid login credentials") || message.contains("invalid_credentials") {
             return .invalidCredentials
@@ -566,6 +624,10 @@ final class AuthenticationService: ObservableObject, AuthenticationServicing {
             return .weakPassword
         }
         return .unknown
+    }
+
+    private static func logPath(_ path: String) -> String {
+        path.split(separator: "?", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? path
     }
 
     private func callbackValues(from url: URL) -> [String: String] {
@@ -622,10 +684,13 @@ private struct ProfileUpdateBody: Encodable {
 private struct EmptyBody: Encodable {}
 
 private struct AuthErrorPayload: Decodable {
+    let code: String?
+    let error: String?
     let message: String?
     let msg: String?
 
     var messageText: String? { message ?? msg }
+    var codeText: String? { code ?? error }
 }
 
 private struct AuthResponse: Decodable {

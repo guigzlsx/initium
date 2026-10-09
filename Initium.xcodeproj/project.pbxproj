@@ -108,7 +108,7 @@
 		026C5935CBEC7F8920C82CA1 /* TransitionPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransitionPlanner.swift; sourceTree = "<group>"; };
 		03C62E2EA8B700EF6B4C8BA8 /* LocalNotificationSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationSchedulerTests.swift; sourceTree = "<group>"; };
 		05C1E3EBDD7D034F341A0A96 /* DayStateResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayStateResolver.swift; sourceTree = "<group>"; };
-		0830F7C07B0A847A3F5B2595 /* Initium.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Initium.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0830F7C07B0A847A3F5B2595 /* Initium.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Initium.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		08BEC68DFF6F7D6D4920AC9A /* ActivityExecutionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityExecutionService.swift; sourceTree = "<group>"; };
 		124756EB90D556CC3B59287C /* ExecutionRecoveryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionRecoveryService.swift; sourceTree = "<group>"; };
 		180B8964AFAE49F1FA91CA3D /* InitiumCalibration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiumCalibration.swift; sourceTree = "<group>"; };
@@ -172,7 +172,7 @@
 		C497C1D601B67CE5CA51935C /* RoutineTemplateApplicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplateApplicationService.swift; sourceTree = "<group>"; };
 		CA67BE17292898E63E77469D /* RoutineTemplateCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplateCatalog.swift; sourceTree = "<group>"; };
 		CEDF89CDD8316CE77CEC6601 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
-		D28CE5D02FFF3C5656A539AD /* InitiumTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = InitiumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D28CE5D02FFF3C5656A539AD /* InitiumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InitiumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2A26758D0C051AE77AEF189 /* ValueSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValueSummaryView.swift; sourceTree = "<group>"; };
 		D373C712C0DA554DA3DF9A26 /* InitiumLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiumLocalization.swift; sourceTree = "<group>"; };
 		D3AA35CD445E5E8B8B1D111B /* RoutineTemplateSuggestionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineTemplateSuggestionCard.swift; sourceTree = "<group>"; };
@@ -557,9 +557,6 @@
 					A8A7ACC5CABD792CCC18B8D8 = {
 						DevelopmentTeam = "";
 					};
-					B55ED970A0A240EC80774A05 = {
-						DevelopmentTeam = "";
-					};
 				};
 			};
 			buildConfigurationList = 662C6B0BAB2367BD55A0379F /* Build configuration list for PBXProject "Initium" */;
@@ -789,6 +786,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 793P56LYAC;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Initium/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Initium;
@@ -911,6 +909,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 793P56LYAC;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Initium/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Initium;
